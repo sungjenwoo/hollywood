@@ -1,0 +1,5 @@
+# Browser QA notes
+
+The live Preview loaded the Home route and returned HTTP 200 for `/`, `/mens`, `/womens`, `/kids`, `/assets/atelier-motion.mp4`, and `/manus-routes.json`. The MENS link navigated in-browser to `/mens`, the future placeholder rendered, and RETURN HOME returned to `/`. The hero VIEW THE EDIT control moved to the Trending Shoes section. The next trending control changed the live counter from `01 / 03` to `02 / 03` and changed the selected silhouette copy from the Cloud Runner note to the Vino Loafer note.
+
+Desktop, tablet and mobile screenshots showed no horizontal overflow or broken campaign layout. The first local video encode was rejected after frame inspection showed a green-channel artifact; the MP4 was re-encoded and the corrected frame is a clean ivory/stone motion study. The post-fix mobile screenshot shows the corrected motion section. The browser console bridge was unavailable in this session, so console validation was supplemented with clean TypeScript/build output, live page rendering, direct route checks and browser click-through.
