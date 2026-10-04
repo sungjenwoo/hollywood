@@ -145,13 +145,20 @@ function Header({ route }: { route: Route }) {
   );
 }
 
-function MediaImage({ src, alt, className = '' }: { src: string; alt: string; className?: string }) {
+function MediaImage({ src, alt, className = '', loading = 'eager', fetchPriority = 'auto' }: {
+  src: string;
+  alt: string;
+  className?: string;
+  loading?: 'eager' | 'lazy';
+  fetchPriority?: 'high' | 'low' | 'auto';
+}) {
   return (
     <img
       src={src}
       alt={alt}
       className={className}
-      loading="lazy"
+      loading={loading}
+      fetchPriority={fetchPriority}
       decoding="async"
       onError={(event) => event.currentTarget.classList.add('media-failed')}
     />
@@ -392,7 +399,7 @@ function HomePage() {
       </section>
 
       <section className="final-campaign section-shell" data-reveal>
-        <div className="final-campaign__media" aria-hidden="true"><MediaImage src={media.hero} alt="" /></div>
+        <div className="final-campaign__media" aria-hidden="true"><MediaImage src={media.hero} alt="" loading="lazy" fetchPriority="low" /></div>
         <div className="final-campaign__content">
           <span className="eyebrow eyebrow--light">The next step starts here</span>
           <h2>Wear the<br /><i>moment.</i></h2>
