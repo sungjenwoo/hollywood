@@ -10,6 +10,7 @@ import {
   Play,
   X,
 } from 'lucide-react';
+import { AdminPostPage } from './admin/AdminStudio';
 import './styles.css';
 
 const media = {
@@ -20,8 +21,8 @@ const media = {
   sand: '/manus-storage/async-images/Foo8zOYI6bAM2cUgdpIgOy/image-5.webp',
 };
 
-type Route = '/' | '/mens' | '/womens' | '/kids';
-type SectionId = 'home' | 'mens' | 'womens' | 'kids';
+type Route = '/' | '/mens' | '/womens' | '/kids' | '/post';
+type SectionId = 'home' | 'mens' | 'womens' | 'kids' | 'post';
 
 const navItems: Array<{ label: string; route: Route; id: SectionId }> = [
   { label: 'HOME', route: '/', id: 'home' },
@@ -53,7 +54,7 @@ const shoes = [
 
 function routeFromLocation(): Route {
   const candidate = window.location.pathname.replace(/\/$/, '') || '/';
-  return (['/', '/mens', '/womens', '/kids'] as string[]).includes(candidate)
+  return (['/', '/mens', '/womens', '/kids', '/post'] as string[]).includes(candidate)
     ? (candidate as Route)
     : '/';
 }
@@ -65,7 +66,7 @@ function navigate(route: Route) {
   }
 }
 
-function Header({ route }: { route: Route }) {
+function Header({ route, isAdmin }: { route: Route; isAdmin: boolean }) {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isScrolled, setScrolled] = useState(false);
 
@@ -90,6 +91,8 @@ function Header({ route }: { route: Route }) {
     setMenuOpen(false);
   };
 
+  const headerNav = isAdmin ? [...navItems, { label: 'POST', route: '/post' as Route, id: 'post' as SectionId }] : navItems;
+
   return (
     <header className={`site-header ${isScrolled || route !== '/' ? 'site-header--solid' : ''}`}>
       <button className="brand" onClick={() => selectRoute('/')} aria-label="Hollywood Shoe Home">
@@ -98,7 +101,7 @@ function Header({ route }: { route: Route }) {
       </button>
 
       <nav className="desktop-nav" aria-label="Main navigation">
-        {navItems.map((item) => (
+        {headerNav.map((item) => (
           <button
             key={item.id}
             className={`nav-link ${route === item.route ? 'nav-link--active' : ''}`}
@@ -106,7 +109,7 @@ function Header({ route }: { route: Route }) {
             aria-current={route === item.route ? 'page' : undefined}
           >
             {item.label}
-            {item.route !== '/' && <span className="nav-link__future" aria-label="Future chapter">SOON</span>}
+            {item.route !== '/' && item.route !== '/post' && <span className="nav-link__future" aria-label="Future chapter">SOON</span>}
           </button>
         ))}
       </nav>
@@ -124,7 +127,7 @@ function Header({ route }: { route: Route }) {
         <div className="mobile-menu__inner">
           <span className="eyebrow">Navigate the house</span>
           <nav aria-label="Mobile navigation">
-            {navItems.map((item, index) => (
+            {headerNav.map((item, index) => (
               <button
                 key={item.id}
                 className={`mobile-nav-link ${route === item.route ? 'mobile-nav-link--active' : ''}`}
@@ -133,7 +136,7 @@ function Header({ route }: { route: Route }) {
               >
                 <span>0{index + 1}</span>
                 {item.label}
-                {item.route !== '/' && <em>FUTURE</em>}
+                {item.route !== '/' && item.route !== '/post' && <em>FUTURE</em>}
               </button>
             ))}
           </nav>
@@ -408,7 +411,7 @@ function HomePage() {
   );
 }
 
-function FuturePage({ route }: { route: Exclude<Route, '/'> }) {
+function FuturePage({ route }: { route: Exclude<Route, '/' | '/post'> }) {
   const label = route.slice(1).toUpperCase();
   return (
     <main className="future-page">
@@ -426,6 +429,7 @@ function FuturePage({ route }: { route: Exclude<Route, '/'> }) {
 
 function App() {
   const [route, setRoute] = useState<Route>(routeFromLocation());
+  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const onPopState = () => setRoute(routeFromLocation());
@@ -434,13 +438,22 @@ function App() {
   }, []);
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'auto' });
-    document.title = route === '/' ? 'Hollywood Shoe — In Motion' : `Hollywood Shoe — ${route.slice(1)} / Future`;
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then((response) => response.ok ? response.json() : null)
+      .then((session: { isAdmin?: boolean } | null) => setIsAdmin(Boolean(session?.isAdmin)))
+      .catch(() => setIsAdmin(false));
   }, [route]);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'auto' });
+    document.title = route === '/' ? 'Hollywood Shoe — In Motion' : route === '/post' ? 'Hollywood Shoe — POST' : `Hollywood Shoe — ${route.slice(1)} / Future`;
+  }, [route]);
+
+  if (route === '/post') return <AdminPostPage />;
 
   return (
     <>
-      <Header route={route} />
+      <Header route={route} isAdmin={isAdmin} />
       {route === '/' ? <HomePage /> : <FuturePage route={route} />}
     </>
   );
