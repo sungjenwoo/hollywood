@@ -66,7 +66,7 @@ function navigate(route: Route) {
   }
 }
 
-function Header({ route, isAdmin }: { route: Route; isAdmin: boolean }) {
+function Header({ route }: { route: Route }) {
   const [isMenuOpen, setMenuOpen] = useState(false);
   const [isScrolled, setScrolled] = useState(false);
 
@@ -91,8 +91,6 @@ function Header({ route, isAdmin }: { route: Route; isAdmin: boolean }) {
     setMenuOpen(false);
   };
 
-  const headerNav = isAdmin ? [...navItems, { label: 'POST', route: '/post' as Route, id: 'post' as SectionId }] : navItems;
-
   return (
     <header className={`site-header ${isScrolled || route !== '/' ? 'site-header--solid' : ''}`}>
       <button className="brand" onClick={() => selectRoute('/')} aria-label="Hollywood Shoe Home">
@@ -101,7 +99,7 @@ function Header({ route, isAdmin }: { route: Route; isAdmin: boolean }) {
       </button>
 
       <nav className="desktop-nav" aria-label="Main navigation">
-        {headerNav.map((item) => (
+        {navItems.map((item) => (
           <button
             key={item.id}
             className={`nav-link ${route === item.route ? 'nav-link--active' : ''}`}
@@ -109,7 +107,7 @@ function Header({ route, isAdmin }: { route: Route; isAdmin: boolean }) {
             aria-current={route === item.route ? 'page' : undefined}
           >
             {item.label}
-            {item.route !== '/' && item.route !== '/post' && <span className="nav-link__future" aria-label="Future chapter">SOON</span>}
+            {item.route !== '/' && <span className="nav-link__future" aria-label="Future chapter">SOON</span>}
           </button>
         ))}
       </nav>
@@ -127,7 +125,7 @@ function Header({ route, isAdmin }: { route: Route; isAdmin: boolean }) {
         <div className="mobile-menu__inner">
           <span className="eyebrow">Navigate the house</span>
           <nav aria-label="Mobile navigation">
-            {headerNav.map((item, index) => (
+            {navItems.map((item, index) => (
               <button
                 key={item.id}
                 className={`mobile-nav-link ${route === item.route ? 'mobile-nav-link--active' : ''}`}
@@ -136,7 +134,7 @@ function Header({ route, isAdmin }: { route: Route; isAdmin: boolean }) {
               >
                 <span>0{index + 1}</span>
                 {item.label}
-                {item.route !== '/' && item.route !== '/post' && <em>FUTURE</em>}
+                {item.route !== '/' && <em>FUTURE</em>}
               </button>
             ))}
           </nav>
@@ -429,20 +427,12 @@ function FuturePage({ route }: { route: Exclude<Route, '/' | '/post'> }) {
 
 function App() {
   const [route, setRoute] = useState<Route>(routeFromLocation());
-  const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
     const onPopState = () => setRoute(routeFromLocation());
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
-
-  useEffect(() => {
-    fetch('/api/auth/me', { credentials: 'include' })
-      .then((response) => response.ok ? response.json() : null)
-      .then((session: { isAdmin?: boolean } | null) => setIsAdmin(Boolean(session?.isAdmin)))
-      .catch(() => setIsAdmin(false));
-  }, [route]);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' });
@@ -453,7 +443,7 @@ function App() {
 
   return (
     <>
-      <Header route={route} isAdmin={isAdmin} />
+      <Header route={route} />
       {route === '/' ? <HomePage /> : <FuturePage route={route} />}
     </>
   );
