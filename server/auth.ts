@@ -88,6 +88,26 @@ function parseOrigin(request: Request): string {
   return url.origin;
 }
 
+function requestOrigins(request: Request): Set<string> {
+  const origins = new Set<string>();
+  const add = (value: string | undefined) => {
+    if (!value) return;
+    try { origins.add(new URL(value).origin); } catch { /* ignore malformed proxy metadata */ }
+  };
+  add(request.get('origin'));
+  add(request.get('referer'));
+  const forwardedHost = request.get('x-forwarded-host');
+  const forwardedProto = request.get('x-forwarded-proto')?.split(',')[0]?.trim() || 'https';
+  if (forwardedHost) {
+    add(`${forwardedProto}://${forwardedHost}`);
+    add(`https://${forwardedHost}`);
+    add(`http://${forwardedHost}`);
+  } else if (request.get('host')) {
+    add(`${forwardedProto}://${request.get('host')}`);
+  }
+  return origins;
+}
+
 function decodeState(state: string): { redirectUri: string; nonce: string } {
   try {
     const decoded = JSON.parse(Buffer.from(state, 'base64url').toString('utf8')) as { redirectUri?: string; nonce?: string };
@@ -176,7 +196,7 @@ export function assertTrustedOrigin(request: Request): void {
   }
   const token = tokenFromRequest(request);
   const claims = token ? verifyApplicationSession(token) : null;
-  if (claims?.origin && claims.origin !== origin) {
+  if (claims?.origin && !requestOrigins(request).has(claims.origin)) {
     const error = new Error('This session belongs to a different website origin.');
     (error as Error & { status?: number }).status = 403;
     throw error;
