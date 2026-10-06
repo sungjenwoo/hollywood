@@ -91,6 +91,8 @@ function Header({ route }: { route: Route }) {
     setMenuOpen(false);
   };
 
+  const headerNav = [...navItems, { label: 'POST', route: '/post' as Route, id: 'post' as SectionId }];
+
   return (
     <header className={`site-header ${isScrolled || route !== '/' ? 'site-header--solid' : ''}`}>
       <button className="brand" onClick={() => selectRoute('/')} aria-label="Hollywood Shoe Home">
@@ -99,7 +101,7 @@ function Header({ route }: { route: Route }) {
       </button>
 
       <nav className="desktop-nav" aria-label="Main navigation">
-        {navItems.map((item) => (
+        {headerNav.map((item) => (
           <button
             key={item.id}
             className={`nav-link ${route === item.route ? 'nav-link--active' : ''}`}
@@ -107,7 +109,7 @@ function Header({ route }: { route: Route }) {
             aria-current={route === item.route ? 'page' : undefined}
           >
             {item.label}
-            {item.route !== '/' && <span className="nav-link__future" aria-label="Future chapter">SOON</span>}
+            {item.route !== '/' && item.route !== '/post' && <span className="nav-link__future" aria-label="Future chapter">SOON</span>}
           </button>
         ))}
       </nav>
@@ -125,7 +127,7 @@ function Header({ route }: { route: Route }) {
         <div className="mobile-menu__inner">
           <span className="eyebrow">Navigate the house</span>
           <nav aria-label="Mobile navigation">
-            {navItems.map((item, index) => (
+            {headerNav.map((item, index) => (
               <button
                 key={item.id}
                 className={`mobile-nav-link ${route === item.route ? 'mobile-nav-link--active' : ''}`}
@@ -134,7 +136,7 @@ function Header({ route }: { route: Route }) {
               >
                 <span>0{index + 1}</span>
                 {item.label}
-                {item.route !== '/' && <em>FUTURE</em>}
+                {item.route !== '/' && item.route !== '/post' && <em>FUTURE</em>}
               </button>
             ))}
           </nav>
