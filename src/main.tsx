@@ -133,7 +133,7 @@ function Header({ route }: { route: Route }) {
             aria-current={route === item.route ? 'page' : undefined}
           >
             {item.label}
-            {item.route !== '/' && item.route !== '/post' && <span className="nav-link__future" aria-label="Future chapter">SOON</span>}
+            {(item.route === '/womens' || item.route === '/kids') && <span className="nav-link__future" aria-label="Future chapter">SOON</span>}
           </button>
         ))}
       </nav>
@@ -160,7 +160,7 @@ function Header({ route }: { route: Route }) {
               >
                 <span>0{index + 1}</span>
                 {item.label}
-                {item.route !== '/' && item.route !== '/post' && <em>FUTURE</em>}
+                {(item.route === '/womens' || item.route === '/kids') && <em>FUTURE</em>}
               </button>
             ))}
           </nav>
@@ -458,7 +458,7 @@ function App() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' });
-    document.title = route === '/' ? 'Hollywood Shoe — In Motion' : route === '/post' ? 'Hollywood Shoe — POST' : `Hollywood Shoe — ${route.slice(1)} / Future`;
+    document.title = route === '/' ? 'Hollywood Shoe — In Motion' : route === '/post' ? 'Hollywood Shoe — POST' : `Hollywood Shoe — ${route.slice(1).toUpperCase()}`;
   }, [route]);
 
   if (route === '/post') return <AdminPostPage />;
