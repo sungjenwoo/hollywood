@@ -90,7 +90,16 @@ app.get('/_app/health', async (_request, response) => {
 });
 
 app.post('/api/auth/login', (request, response, next) => { try { beginLogin(request, response); } catch (error) { next(error); } });
-app.get('/api/auth/callback', (request, response, next) => { finishLogin(request, response).catch(next); });
+app.get('/api/auth/callback', (request, response) => {
+  finishLogin(request, response).catch((error: unknown) => {
+    const typed = error as Error & { code?: string };
+    // OAuth responses are browser navigations: return to the protected screen rather
+    // than exposing a raw API error document. The detailed cause remains server-side.
+    console.warn('[POST OAuth callback]', typed.code || typed.message || 'POST_CALLBACK_FAILED');
+    const reason = typed.code === 'POST_STATE_MISSING' || typed.code === 'POST_STATE_INVALID' ? 'state' : 'failed';
+    response.redirect(302, `/post?auth_error=${reason}`);
+  });
+});
 app.post('/api/auth/logout', (_request, response) => logout(response));
 app.get('/api/auth/me', async (request, response, next) => { try { response.json(sessionPublicView(await resolveUser(request))); } catch (error) { next(error); } });
 

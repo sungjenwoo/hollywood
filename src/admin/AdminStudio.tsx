@@ -31,9 +31,14 @@ function StatusPill({ status }: { status: ProductStatus }) {
   return <span className={`admin-status admin-status--${status}`}>{status.replace('_', ' ')}</span>;
 }
 
-function StudioLogin({ accessDenied }: { accessDenied: boolean }) {
+function StudioLogin({ accessDenied, authError }: { accessDenied: boolean; authError: 'state' | 'failed' | null }) {
   const [pending, setPending] = useState(false);
   const [loginError, setLoginError] = useState('');
+  const callbackError = authError === 'state'
+    ? 'Secure sign-in was interrupted before it could complete. Please continue again.'
+    : authError === 'failed'
+      ? 'Secure sign-in could not complete. Please continue again.'
+      : '';
   return (
     <main className="admin-login">
       <div className="admin-login__grain" />
@@ -42,7 +47,7 @@ function StudioLogin({ accessDenied }: { accessDenied: boolean }) {
         <p className="admin-kicker">Private product studio</p>
         <h1>Make the first<br /><i>impression</i> deliberate.</h1>
         <p className="admin-login__note">POST is reserved for approved Hollywood Shoe administrators. Sign in through the protected Manus workspace to continue.</p>
-        {(accessDenied || loginError) && <p className="admin-notice admin-notice--error"><CircleAlert size={16} /> {loginError || 'This account is authenticated, but not approved for POST.'}</p>}
+        {(accessDenied || loginError || callbackError) && <p className="admin-notice admin-notice--error"><CircleAlert size={16} /> {loginError || callbackError || 'This account is authenticated, but not approved for POST.'}</p>}
         <button className="admin-button admin-button--primary" onClick={async () => { setPending(true); setLoginError(''); try { await api.login(); } catch (error) { setPending(false); setLoginError(error instanceof Error ? error.message : 'Secure sign-in could not start. Please try again.'); } }} disabled={pending}>
           <ShieldCheck size={17} /> {pending ? 'Opening secure sign in…' : 'Continue with secure access'}
         </button>
@@ -255,7 +260,10 @@ export function AdminPostPage() {
   useEffect(() => { api.session().then(setSession).catch(() => setSession({ authenticated: false, isAdmin: false, user: null })); }, []);
   useEffect(() => { if (session?.isAdmin && tab !== 'create') refresh(tab === 'drafts' ? 'draft' : tab === 'published' ? 'published' : tab === 'scheduled' ? 'scheduled' : undefined); }, [session?.isAdmin, tab]);
   if (!session) return <main className="admin-loading"><div><span className="studio-mark"><i /><b>HOLLYWOOD<br />SHOE</b></span><p>Opening private studio…</p></div></main>;
-  if (!session.isAdmin) return <StudioLogin accessDenied={new URLSearchParams(window.location.search).get('access') === 'denied'} />;
+  if (!session.isAdmin) {
+    const authError = new URLSearchParams(window.location.search).get('auth_error');
+    return <StudioLogin accessDenied={new URLSearchParams(window.location.search).get('access') === 'denied'} authError={authError === 'state' || authError === 'failed' ? authError : null} />;
+  }
   const create = async () => { try { const { product: next } = await api.createProduct(); setProduct(next); setTab('create'); setMessage('A fresh draft is ready for its first image.'); } catch (error) { setMessage(error instanceof Error ? error.message : 'Could not start a product draft.', true); } };
   const open = (selected: Product) => { setProduct(selected); setTab('create'); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   const duplicate = async (selected: Product) => { try { const { product: copy } = await api.duplicate(selected.id); open(copy); setMessage('A duplicate draft is ready to refine.'); } catch (error) { setMessage(error instanceof Error ? error.message : 'Could not duplicate this product.', true); } };

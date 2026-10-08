@@ -7,6 +7,7 @@ import type { AdminUser } from './types.js';
 const COOKIE = 'webdev_app_session';
 const STATE_COOKIE = 'hs_oauth_state';
 const SESSION_TTL_SECONDS = 60 * 60 * 8;
+const STATE_TTL_MS = 15 * 60 * 1000;
 
 type SessionClaims = {
   openId: string;
@@ -29,9 +30,10 @@ type OAuthUser = {
   email?: string | null;
 };
 
-function badRequest(message: string): Error & { status?: number } {
-  const error = new Error(message) as Error & { status?: number };
+function badRequest(message: string, code = 'POST_BAD_REQUEST'): Error & { status?: number; code?: string } {
+  const error = new Error(message) as Error & { status?: number; code?: string };
   error.status = 400;
+  error.code = code;
   return error;
 }
 
@@ -58,6 +60,16 @@ const cookieOptions = () => ({
   httpOnly: true,
   secure: true,
   sameSite: 'none' as const,
+  path: '/',
+});
+
+// The application session must work inside embedded Preview, while this short-lived
+// state binding only needs to return with the top-level OAuth callback. Lax cookies
+// are reliably sent on that cross-site GET navigation on the hosted manus.space site.
+const stateCookieOptions = () => ({
+  httpOnly: true,
+  secure: true,
+  sameSite: 'lax' as const,
   path: '/',
 });
 
@@ -116,7 +128,7 @@ function decodeState(state: string): { redirectUri: string; nonce: string } {
     if (redirect.pathname !== '/api/auth/callback') throw new Error();
     return { redirectUri: redirect.toString(), nonce: decoded.nonce };
   } catch {
-    throw badRequest('The secure sign-in state is invalid. Please start sign-in again.');
+    throw badRequest('The secure sign-in state is invalid. Please start sign-in again.', 'POST_STATE_INVALID');
   }
 }
 
@@ -222,7 +234,7 @@ export function beginLogin(request: Request, response: Response): void {
   const origin = parseOrigin(request);
   const nonce = randomBytes(32).toString('base64url');
   const redirectUri = `${origin}/api/auth/callback`;
-  response.cookie(STATE_COOKIE, nonce, { ...cookieOptions(), maxAge: 10 * 60 * 1000 });
+  response.cookie(STATE_COOKIE, nonce, { ...stateCookieOptions(), maxAge: STATE_TTL_MS });
   const state = Buffer.from(JSON.stringify({ redirectUri, nonce }), 'utf8').toString('base64url');
   const portal = new URL('/app-auth', required('MANUS_OAUTH_PORTAL_URL'));
   portal.searchParams.set('appId', required('MANUS_PROJECT_ID'));
@@ -237,8 +249,8 @@ export async function finishLogin(request: Request, response: Response): Promise
   const state = typeof request.query.state === 'string' ? request.query.state : '';
   if (!code || !state) throw badRequest('The provider did not return a complete sign-in response.');
   const decoded = decodeState(state);
-  if (!request.cookies?.[STATE_COOKIE] || request.cookies[STATE_COOKIE] !== decoded.nonce) throw badRequest('The secure sign-in state expired. Please return to POST and try again.');
-  response.clearCookie(STATE_COOKIE, cookieOptions());
+  if (!request.cookies?.[STATE_COOKIE] || request.cookies[STATE_COOKIE] !== decoded.nonce) throw badRequest('The secure sign-in state expired. Please return to POST and try again.', 'POST_STATE_MISSING');
+  response.clearCookie(STATE_COOKIE, stateCookieOptions());
   const api = required('MANUS_OAUTH_API_URL').replace(/\/$/, '');
   const tokenResponse = await fetch(`${api}/webdev.v1.WebDevAuthPublicService/ExchangeToken`, {
     method: 'POST',
