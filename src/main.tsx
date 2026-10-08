@@ -20,9 +20,10 @@ const media = {
   pumaStadium: '/manus-storage/.tmp-puma-palermo-campaign_c9a351b1.webp',
   pumaNet: '/manus-storage/puma-palermo-net_d833beb2.jpg',
   pumaSpeedcat: '/manus-storage/puma-speedcat-campaign_c8fb936a.jpg',
-  pumaSpeedcatLux: '/manus-storage/G2sWIq3DQhAR_d90fb39a.jpg',
-  pumaMostro: '/manus-storage/h2eOAqgpguXf_07c8ba77.jpg',
-  pumaPalermoRose: '/manus-storage/Mi9QkWoFj2ol_1cdc900d.jpg',
+  pumaSpeedcatProduct: '/manus-storage/qgC7VqnT1nFO_d452084c.jpg',
+  pumaSpeedcatBlack: '/manus-storage/Gj7VLG5izFC9_8ef2cba7.jpeg',
+  pumaMostro: '/manus-storage/wiylwmeC0RMj_406b15d9.jpg',
+  pumaPalermoRose: '/manus-storage/J026xMeLSvJv_6b0cbcfe.jpg',
   pumaMostroCampaign: '/manus-storage/qTTcEUee3T6s_69420c33.jpg',
 };
 
@@ -38,22 +39,25 @@ const navItems: Array<{ label: string; route: Route; id: SectionId }> = [
 
 const shoes = [
   {
-    name: 'Speedcat Lux',
-    category: '01 / Women’s track form',
-    image: media.pumaSpeedcatLux,
-    note: 'Low, graphic, and made for after-dark movement.',
+    name: 'Speedcat OG',
+    category: '01 / Low-profile form',
+    image: media.pumaSpeedcatBlack,
+    imageClass: 'shoe-product--speedcat',
+    note: 'A clean, close-to-ground line with motorsport roots.',
   },
   {
     name: 'Mostro',
-    category: '02 / Sculpted edge',
+    category: '02 / Textured grip',
     image: media.pumaMostro,
-    note: 'A bold profile with a new kind of energy.',
+    imageClass: 'shoe-product--mostro',
+    note: 'An offbeat profile with a sculpted, spiked sole.',
   },
   {
-    name: 'Palermo',
-    category: '03 / City classic',
+    name: 'Palermo 0161',
+    category: '03 / Archive colour',
     image: media.pumaPalermoRose,
-    note: 'An archive icon, styled for the street.',
+    imageClass: 'shoe-product--palermo',
+    note: 'A classic court silhouette, delivered in bright blue.',
   },
 ];
 
@@ -288,7 +292,7 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="trending section-shell" id="the-edit" aria-label="Trending Puma women’s footwear">
+      <section className="trending section-shell" id="the-edit" aria-label="Trending Puma footwear">
         <div className="section-heading" data-reveal>
           <div>
             <span className="eyebrow">The new edit</span>
@@ -312,7 +316,7 @@ function HomePage() {
               aria-pressed={activeShoe === index}
             >
               <span className="shoe-card__image image-frame">
-                <MediaImage src={item.image} alt={`${item.name} shoe`} />
+                <MediaImage src={item.image} alt={`${item.name} shoe`} className={item.imageClass} />
                 <span className="shoe-card__number">0{index + 1}</span>
               </span>
               <span className="shoe-card__info">
@@ -331,7 +335,7 @@ function HomePage() {
       </section>
 
       <section className="statement-panel statement-panel--speedcat section-shell" data-reveal>
-        <div className="statement-panel__media" aria-hidden="true"><MediaImage src={media.pumaSpeedcat} alt="" fetchPriority="high" /></div>
+        <div className="statement-panel__media" aria-hidden="true"><MediaImage src={media.pumaSpeedcatProduct} alt="" fetchPriority="high" /></div>
         <div className="statement-panel__content">
           <span className="eyebrow eyebrow--light">PUMA® / SPEEDCAT</span>
           <h2>Red runs<br /><i>the city.</i></h2>

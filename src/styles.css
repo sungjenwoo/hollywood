@@ -96,6 +96,9 @@ h1 i, h2 i { font-weight: 400; }
 .shoe-card { padding: 0; text-align: left; }
 .shoe-card__image { aspect-ratio: 4 / 5; display: block; }
 .shoe-card__image img { height: 100%; object-fit: cover; transition: transform 800ms var(--ease), filter 500ms var(--ease); width: 100%; }
+.shoe-product--speedcat { object-position: center 76%; }
+.shoe-product--mostro { object-position: center 59%; }
+.shoe-product--palermo { object-position: 62% center; }
 .shoe-card:hover .shoe-card__image img, .shoe-card--active .shoe-card__image img { transform: scale(1.05); }
 .shoe-card:not(.shoe-card--active) .shoe-card__image img { filter: saturate(.85) contrast(.96); }
 .shoe-card__number { bottom: 25px; color: var(--white); font-size: 10px; font-weight: 700; letter-spacing: .15em; position: absolute; right: 26px; z-index: 1; }
@@ -112,7 +115,7 @@ h1 i, h2 i { font-weight: 400; }
 .statement-panel::after { border: 1px solid rgba(255,252,247,.12); border-radius: 50%; content: ''; height: min(50vw, 720px); left: -20vw; position: absolute; top: 45%; width: min(50vw, 720px); z-index: 1; }
 .statement-panel__media, .statement-panel__media::after { inset: 0; position: absolute; }
 .statement-panel__media { background: #8b1520; z-index: 0; }
-.statement-panel__media img { height: 100%; object-fit: cover; object-position: center; width: 100%; }
+.statement-panel__media img { height: 100%; object-fit: cover; object-position: center 58%; width: 100%; }
 .statement-panel__media::after { background: linear-gradient(90deg, rgba(41,6,10,.7) 0%, rgba(60,5,12,.2) 56%, rgba(29,4,8,.34) 100%); content: ''; }
 .statement-panel__content { display: flex; flex-direction: column; height: 100%; justify-content: space-between; min-height: 560px; position: relative; z-index: 2; }
 .statement-panel h2 { font-size: clamp(69px, 10vw, 170px); line-height: .82; margin: auto 0; max-width: 900px; }
@@ -230,7 +233,7 @@ h1 i, h2 i { font-weight: 400; }
   .shoe-detail { display: block; margin: 48px 7vw 0; padding-top: 18px; }
   .shoe-detail p { font-size: 33px; margin-top: 16px; }
   .statement-panel { min-height: 560px; padding: 11vh 7vw 8vh; }
-  .statement-panel__media img { object-position: 57% center; }
+  .statement-panel__media img { object-position: center 58%; }
   .statement-panel__content { min-height: 405px; }
   .statement-panel h2 { font-size: clamp(65px, 18vw, 100px); }
   .statement-panel__foot { font-size: 8px; }
