@@ -29,6 +29,21 @@ const media = {
 
 type Route = '/' | '/mens' | '/womens' | '/kids' | '/post';
 type SectionId = 'home' | 'mens' | 'womens' | 'kids' | 'post';
+type CollectionRoute = Exclude<Route, '/' | '/post'>;
+
+type PublicProduct = {
+  id: string;
+  name: string;
+  description: string;
+  productType: string;
+  category: 'MENS' | 'WOMENS' | 'KIDS';
+  originalPrice: number | null;
+  salePrice: number | null;
+  badges: string[];
+  featured: boolean;
+  trending: boolean;
+  imageUrl: string;
+};
 
 const navItems: Array<{ label: string; route: Route; id: SectionId }> = [
   { label: 'HOME', route: '/', id: 'home' },
@@ -389,18 +404,45 @@ function HomePage() {
   );
 }
 
-function FuturePage({ route }: { route: Exclude<Route, '/' | '/post'> }) {
+function CollectionPage({ route }: { route: CollectionRoute }) {
   const label = route.slice(1).toUpperCase();
+  const category = label === 'MENS' ? 'MENS' : label === 'WOMENS' ? 'WOMENS' : 'KIDS';
+  const [products, setProducts] = useState<PublicProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setFailed(false);
+    fetch(`/api/products?category=${category}`)
+      .then((response) => { if (!response.ok) throw new Error('Collection unavailable'); return response.json() as Promise<{ products: PublicProduct[] }>; })
+      .then((data) => { if (active) setProducts(data.products); })
+      .catch(() => { if (active) setFailed(true); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, [category]);
+
+  const formatPrice = (value: number | null) => value === null ? 'Price on request' : new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(value);
+
   return (
-    <main className="future-page">
-      <section className="future-page__content">
-        <span className="eyebrow">Hollywood Shoe / Future chapter</span>
-        <p className="future-page__counter">0{navItems.findIndex((item) => item.route === route) + 1}</p>
-        <h1>{label}<br /><i>is next.</i></h1>
-        <p>We’re preparing this part of the house with the same attention to form. The collection experience is not open yet.</p>
-        <button className="text-link" onClick={() => navigate('/')}>Return Home <ArrowDownRight size={17} /></button>
+    <main className="collection-page">
+      <section className="collection-hero">
+        <div>
+          <span className="eyebrow">Hollywood Shoe / Collection</span>
+          <p className="collection-page__counter">0{navItems.findIndex((item) => item.route === route) + 1}</p>
+          <h1>{label}<br /><i>in motion.</i></h1>
+        </div>
+        <p className="collection-hero__note">Published releases, considered for the next chapter of the house.</p>
       </section>
-      <div className="future-page__orb" aria-hidden="true" />
+      {loading ? <div className="collection-state"><span className="eyebrow">Loading the edit…</span></div> : failed ? <div className="collection-state"><span className="eyebrow">The collection is temporarily unavailable.</span><button className="text-link" onClick={() => window.location.reload()}>Try again <ArrowRight size={17} /></button></div> : products.length ? (
+        <section className="collection-grid" aria-label={`${label} published products`}>
+          {products.map((product, index) => <article className="collection-card" key={product.id}>
+            <div className="collection-card__image image-frame"><img src={product.imageUrl} alt={product.name} loading={index < 2 ? 'eager' : 'lazy'} decoding="async" /></div>
+            <div className="collection-card__meta"><span>{product.productType || 'Footwear'} {product.trending ? '· Trending' : ''}</span><strong>{product.name || 'Hollywood Shoe release'}</strong><p>{product.description}</p><b>{formatPrice(product.salePrice ?? product.originalPrice)}</b></div>
+          </article>)}
+        </section>
+      ) : <section className="collection-empty"><span className="eyebrow">The next edit is being prepared.</span><h2>{label}<br /><i>is next.</i></h2><p>Published releases for this collection will appear here once they are approved in POST.</p><button className="text-link" onClick={() => navigate('/')}>Return Home <ArrowDownRight size={17} /></button></section>}
     </main>
   );
 }
@@ -424,7 +466,7 @@ function App() {
   return (
     <>
       <Header route={route} />
-      {route === '/' ? <HomePage /> : <FuturePage route={route} />}
+      {route === '/' ? <HomePage /> : <CollectionPage route={route} />}
     </>
   );
 }

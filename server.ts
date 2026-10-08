@@ -103,6 +103,39 @@ app.get('/api/auth/callback', (request, response) => {
 app.post('/api/auth/logout', (_request, response) => logout(response));
 app.get('/api/auth/me', async (request, response, next) => { try { response.json(sessionPublicView(await resolveUser(request))); } catch (error) { next(error); } });
 
+app.get('/api/products', async (request, response, next) => {
+  try {
+    const rawCategory = typeof request.query.category === 'string' ? request.query.category.toUpperCase() : '';
+    if (!['MENS', 'WOMENS', 'KIDS'].includes(rawCategory)) {
+      response.status(400).json({ error: { message: 'Choose a valid collection category.' } });
+      return;
+    }
+    const products = await listProducts({ status: 'published' });
+    response.json({
+      products: products
+        .filter((product) => product.category === rawCategory)
+        .map((product) => {
+          const image = product.assets.find((asset) => asset.id === product.primaryAssetId && asset.isApproved)
+            || product.assets.find((asset) => asset.isApproved);
+          return {
+            id: product.id,
+            name: product.name,
+            description: product.shortDescription || product.description,
+            productType: product.productType,
+            category: product.category,
+            originalPrice: product.originalPrice,
+            salePrice: product.salePrice,
+            badges: product.badges,
+            featured: product.featured,
+            trending: product.trending,
+            imageUrl: image?.url || null,
+          };
+        })
+        .filter((product) => product.imageUrl),
+    });
+  } catch (error) { next(error); }
+});
+
 app.get('/api/admin/products', (request, response, next) => withAdmin(request, response, async () => {
   const status = typeof request.query.status === 'string' ? request.query.status as ProductStatus : undefined;
   const search = typeof request.query.search === 'string' ? request.query.search.slice(0, 100) : undefined;

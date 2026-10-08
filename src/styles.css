@@ -165,12 +165,24 @@ h1 i, h2 i { font-weight: 400; }
 .site-footer p, .site-footer span { color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .1em; margin: 0; text-transform: uppercase; }
 .site-footer span { justify-self: end; }
 
-.future-page { align-items: center; background: var(--paper); display: flex; min-height: 100svh; overflow: hidden; padding: 150px 11vw 100px; position: relative; }
-.future-page__content { max-width: 780px; position: relative; z-index: 2; }
-.future-page__counter { color: var(--oxblood); font-family: 'DM Serif Display', Georgia, serif; font-size: 18px; margin: 48px 0 15px; }
-.future-page h1 { font-size: clamp(77px, 12vw, 190px); line-height: .78; margin: 0 0 42px; }
-.future-page__content > p:not(.future-page__counter) { color: var(--muted); font-size: 14px; line-height: 1.75; margin-bottom: 28px; max-width: 330px; }
-.future-page__orb { background: radial-gradient(circle at 30% 28%, #f1e9dd, #d5c2aa 65%, #ae7b75); border-radius: 50%; height: min(68vw, 900px); position: absolute; right: -16vw; top: 12%; transform: rotate(16deg); width: min(68vw, 900px); }
+.collection-page { background: var(--paper); min-height: 100svh; padding: 150px 7vw 110px; }
+.collection-hero { align-items: end; border-bottom: 1px solid rgba(32,29,27,.18); display: grid; gap: 60px; grid-template-columns: minmax(0, 1fr) minmax(220px, .5fr); padding-bottom: 65px; }
+.collection-page__counter { color: var(--oxblood); font-family: 'DM Serif Display', Georgia, serif; font-size: 18px; margin: 48px 0 15px; }
+.collection-hero h1 { font-size: clamp(77px, 12vw, 190px); line-height: .78; margin: 0; }
+.collection-hero__note { color: var(--muted); font-size: 14px; line-height: 1.75; margin: 0 0 10px; max-width: 310px; }
+.collection-grid { display: grid; gap: clamp(18px, 2.4vw, 36px); grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 65px; }
+.collection-card { background: #e8e0d6; min-width: 0; }
+.collection-card__image { aspect-ratio: 4 / 4.7; background: #f8f5ef; overflow: hidden; }
+.collection-card__image img { height: 100%; object-fit: contain; transition: transform 700ms var(--ease); width: 100%; }
+.collection-card:hover .collection-card__image img { transform: scale(1.04); }
+.collection-card__meta { display: grid; gap: 8px; padding: 20px 21px 24px; }
+.collection-card__meta span { color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+.collection-card__meta strong { font-family: 'DM Serif Display', Georgia, serif; font-size: clamp(26px, 2.5vw, 39px); font-weight: 400; letter-spacing: -.035em; }
+.collection-card__meta p { color: var(--muted); font-size: 12px; line-height: 1.65; margin: 0; max-width: 310px; }
+.collection-card__meta b { font-size: 11px; letter-spacing: .08em; margin-top: 7px; }
+.collection-state, .collection-empty { min-height: 46vh; padding-top: 15vh; }
+.collection-empty h2 { font-size: clamp(62px, 9vw, 130px); line-height: .82; margin: 25px 0 30px; }
+.collection-empty p { color: var(--muted); font-size: 14px; line-height: 1.75; margin-bottom: 28px; max-width: 330px; }
 
 @media (max-width: 900px) {
   .site-header { height: 76px; padding: 0 5vw; }
@@ -259,9 +271,13 @@ h1 i, h2 i { font-weight: 400; }
   .final-campaign h2 { font-size: clamp(68px, 19vw, 105px); }
   .site-footer { display: flex; flex-direction: column; padding: 32px 7vw; text-align: center; }
   .footer-brand, .site-footer span { justify-self: unset; }
-  .future-page { padding: 130px 8vw 80px; }
-  .future-page h1 { font-size: clamp(72px, 21vw, 110px); }
-  .future-page__orb { height: 130vw; opacity: .65; right: -55vw; top: 44%; width: 130vw; }
+  .collection-page { padding: 126px 7vw 80px; }
+  .collection-hero { align-items: start; display: block; padding-bottom: 45px; }
+  .collection-hero h1 { font-size: clamp(70px, 21vw, 112px); margin-bottom: 35px; }
+  .collection-hero__note { margin-left: 19%; }
+  .collection-grid { display: grid; grid-template-columns: 1fr; margin-top: 45px; }
+  .collection-card__meta strong { font-size: 34px; }
+  .collection-empty { padding-top: 12vh; }
 }
 
 @media (prefers-reduced-motion: reduce) {
