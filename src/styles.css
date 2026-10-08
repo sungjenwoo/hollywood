@@ -126,6 +126,13 @@ h1 i, h2 i { font-weight: 400; }
 .motion-film__fallback { background: radial-gradient(circle at 60% 34%, rgba(255,252,247,.9), transparent 21%), linear-gradient(110deg, #d3bfaa, #f3ede3 48%, #bfa184); inset: 0; opacity: 0; position: absolute; transition: opacity 350ms var(--ease); }
 .motion-film--fallback .motion-film__fallback { opacity: 1; }
 .motion-film--fallback .play-control { display: none; }
+.puma-film { background: #a9878a; color: var(--white); }
+.puma-film img { height: 100%; object-fit: cover; object-position: center 58%; transition: transform 1.2s var(--ease); width: 100%; }
+.puma-film:hover img { transform: scale(1.035); }
+.puma-film__wash { background: linear-gradient(90deg, rgba(31,23,21,.36), transparent 55%), linear-gradient(0deg, rgba(31,23,21,.46), transparent 52%); inset: 0; pointer-events: none; position: absolute; }
+.puma-film__caption { bottom: 30px; display: flex; flex-direction: column; gap: 8px; left: 30px; position: absolute; z-index: 2; }
+.puma-film__caption span { font-size: 9px; font-weight: 700; letter-spacing: .14em; opacity: .86; }
+.puma-film__caption strong { font-family: 'DM Serif Display', Georgia, serif; font-size: clamp(32px, 4.2vw, 64px); font-weight: 400; letter-spacing: -.045em; line-height: .88; }
 
 .feature-story { align-items: center; background: var(--white); display: grid; gap: 10vw; grid-template-columns: .8fr 1.2fr; min-height: 900px; overflow: hidden; padding: clamp(100px, 12vw, 180px) 10.4vw; }
 .feature-story__copy { padding-left: 5vw; }
@@ -136,6 +143,8 @@ h1 i, h2 i { font-weight: 400; }
 .feature-story__tile:hover img { transform: scale(1.05); }
 .feature-story__tile--upper { aspect-ratio: 4 / 5; right: 4%; top: 0; width: min(27vw, 395px); }
 .feature-story__tile--lower { aspect-ratio: 4 / 5; bottom: 0; left: 0; width: min(25vw, 360px); }
+.feature-story__tile--upper img { object-position: 57% 50%; }
+.feature-story__tile--lower img { object-position: 24% center; }
 .feature-story__line { color: var(--oxblood); font-family: 'DM Serif Display', Georgia, serif; font-size: clamp(25px, 3vw, 43px); left: 43%; letter-spacing: -.045em; line-height: .93; position: absolute; top: 44%; z-index: 2; }
 
 .final-campaign { background: var(--deep); color: var(--white); display: grid; min-height: min(100svh, 960px); overflow: hidden; place-items: center; }
@@ -229,6 +238,9 @@ h1 i, h2 i { font-weight: 400; }
   .motion-film video { object-position: center; }
   .motion-film__overlay { left: 18px; right: 18px; top: 18px; }
   .play-control { bottom: 17px; height: 48px; right: 17px; width: 48px; }
+  .puma-film img { object-position: 64% center; }
+  .puma-film__caption { bottom: 22px; left: 20px; }
+  .puma-film__caption strong { font-size: clamp(38px, 11vw, 58px); }
   .feature-story { display: flex; flex-direction: column; gap: 45px; min-height: auto; padding-bottom: 92px; padding-top: 92px; }
   .feature-story__copy { align-self: flex-start; padding-left: 10%; }
   .feature-story h2 { font-size: clamp(54px, 15vw, 78px); }

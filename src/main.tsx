@@ -6,8 +6,6 @@ import {
   ArrowRight,
   ArrowUpRight,
   Menu,
-  Pause,
-  Play,
   X,
 } from 'lucide-react';
 import { AdminPostPage } from './admin/AdminStudio';
@@ -19,6 +17,9 @@ const media = {
   cloud: '/manus-storage/async-images/Foo8zOYI6bAM2cUgdpIgOy/image-3.webp',
   vino: '/manus-storage/async-images/Foo8zOYI6bAM2cUgdpIgOy/image-4.webp',
   sand: '/manus-storage/async-images/Foo8zOYI6bAM2cUgdpIgOy/image-5.webp',
+  pumaStadium: '/manus-storage/.tmp-puma-palermo-campaign_c9a351b1.webp',
+  pumaNet: '/manus-storage/puma-palermo-net_d833beb2.jpg',
+  pumaSpeedcat: '/manus-storage/puma-speedcat-campaign_c8fb936a.jpg',
 };
 
 type Route = '/' | '/mens' | '/womens' | '/kids' | '/post';
@@ -169,9 +170,6 @@ function MediaImage({ src, alt, className = '', loading = 'eager', fetchPriority
 
 function HomePage() {
   const [activeShoe, setActiveShoe] = useState(0);
-  const [videoPaused, setVideoPaused] = useState(false);
-  const [videoFallback, setVideoFallback] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const touchStartX = useRef<number | null>(null);
   const shoeRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
@@ -238,22 +236,6 @@ function HomePage() {
     const difference = end - start;
     if (Math.abs(difference) > 46) selectShoe(activeShoe + (difference < 0 ? 1 : -1));
     touchStartX.current = null;
-  };
-
-  const toggleVideo = async () => {
-    const video = videoRef.current;
-    if (!video || videoFallback) return;
-    if (video.paused) {
-      try {
-        await video.play();
-        setVideoPaused(false);
-      } catch {
-        setVideoPaused(true);
-      }
-    } else {
-      video.pause();
-      setVideoPaused(true);
-    }
   };
 
   const shoe = shoes[activeShoe];
@@ -352,51 +334,34 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="motion-section section-shell" aria-label="Atelier motion film">
+      <section className="motion-section section-shell" aria-label="Puma Palermo premium footwear campaign">
         <div className="motion-section__top" data-reveal>
-          <span className="eyebrow">The moving image</span>
-          <h2>Atelier<br /><i>in light.</i></h2>
-          <p>A study in warm surfaces, shifting shade and the small decision to move forward.</p>
+          <span className="eyebrow">Puma / Premium footwear</span>
+          <h2>Palermo<br /><i>in focus.</i></h2>
+          <p>A premium PUMA Palermo study: stadium light, sculptural colour and a silhouette made to hold the frame.</p>
         </div>
-        <div className={`motion-film image-frame ${videoFallback ? 'motion-film--fallback' : ''}`} data-reveal>
-          {!videoFallback && (
-            <video
-              ref={videoRef}
-              src="/assets/atelier-motion.mp4"
-              poster={media.hero}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              onPlay={() => setVideoPaused(false)}
-              onPause={() => setVideoPaused(true)}
-              onError={() => setVideoFallback(true)}
-              aria-label="An abstract motion study in warm ivory and stone tones"
-            />
-          )}
-          <div className="motion-film__overlay"><span>Film / 00:08</span><span>{videoFallback ? 'Still study' : 'Muted'} </span></div>
-          <button className="play-control" onClick={toggleVideo} aria-label={videoPaused ? 'Play film' : 'Pause film'}>
-            {videoPaused ? <Play size={20} fill="currentColor" /> : <Pause size={19} fill="currentColor" />}
-          </button>
-          <div className="motion-film__fallback" aria-hidden="true" />
+        <div className="motion-film puma-film image-frame" data-reveal>
+          <MediaImage src={media.pumaStadium} alt="PUMA Palermo footwear campaign in a football stadium" fetchPriority="high" />
+          <div className="puma-film__wash" aria-hidden="true" />
+          <div className="motion-film__overlay"><span>PUMA® / PALERMO</span><span>Campaign / 01</span></div>
+          <div className="puma-film__caption"><span>PREMIUM EDIT</span><strong>Archive sport,<br />reframed.</strong></div>
         </div>
       </section>
 
       <section className="feature-story section-shell">
         <div className="feature-story__copy" data-reveal>
-          <span className="eyebrow">A closer study</span>
-          <h2>Walk softly.<br /><i>Leave texture.</i></h2>
-          <p>Shape meets surface in a softer, more intentional rhythm.</p>
+          <span className="eyebrow">Puma / Archive icons</span>
+          <h2>Move with<br /><i>intention.</i></h2>
+          <p>Palermo and Speedcat: two PUMA classics, reintroduced through colour, texture and unmistakable sport heritage.</p>
         </div>
         <div className="feature-story__stack" data-reveal>
           <div className="feature-story__tile feature-story__tile--upper image-frame">
-            <MediaImage src={media.sand} alt="Sand colored woven leather mule on a pale clay pedestal" />
+            <MediaImage src={media.pumaNet} alt="PUMA Palermo premium sneakers held beside a football net" fetchPriority="low" />
           </div>
           <div className="feature-story__tile feature-story__tile--lower image-frame">
-            <MediaImage src={media.vino} alt="Oxblood polished leather loafer on a sandstone pedestal" />
+            <MediaImage src={media.pumaSpeedcat} alt="Red PUMA Speedcat premium footwear campaign" fetchPriority="low" />
           </div>
-          <span className="feature-story__line">Details<br />become direction.</span>
+          <span className="feature-story__line">Icons<br />in motion.</span>
         </div>
       </section>
 
