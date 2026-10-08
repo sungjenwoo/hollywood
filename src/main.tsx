@@ -20,6 +20,10 @@ const media = {
   pumaStadium: '/manus-storage/.tmp-puma-palermo-campaign_c9a351b1.webp',
   pumaNet: '/manus-storage/puma-palermo-net_d833beb2.jpg',
   pumaSpeedcat: '/manus-storage/puma-speedcat-campaign_c8fb936a.jpg',
+  pumaSpeedcatLux: '/manus-storage/G2sWIq3DQhAR_d90fb39a.jpg',
+  pumaMostro: '/manus-storage/h2eOAqgpguXf_07c8ba77.jpg',
+  pumaPalermoRose: '/manus-storage/Mi9QkWoFj2ol_1cdc900d.jpg',
+  pumaMostroCampaign: '/manus-storage/qTTcEUee3T6s_69420c33.jpg',
 };
 
 type Route = '/' | '/mens' | '/womens' | '/kids' | '/post';
@@ -34,22 +38,22 @@ const navItems: Array<{ label: string; route: Route; id: SectionId }> = [
 
 const shoes = [
   {
-    name: 'Cloud Runner',
-    category: '01 / Soft geometry',
-    image: media.cloud,
-    note: 'An easy stride, drawn in light.',
+    name: 'Speedcat Lux',
+    category: '01 / Women’s track form',
+    image: media.pumaSpeedcatLux,
+    note: 'Low, graphic, and made for after-dark movement.',
   },
   {
-    name: 'Vino Loafer',
-    category: '02 / Polished form',
-    image: media.vino,
-    note: 'A familiar line, finished with intention.',
+    name: 'Mostro',
+    category: '02 / Sculpted edge',
+    image: media.pumaMostro,
+    note: 'A bold profile with a new kind of energy.',
   },
   {
-    name: 'Dune Mule',
-    category: '03 / Quiet texture',
-    image: media.sand,
-    note: 'A softer way through the day.',
+    name: 'Palermo',
+    category: '03 / City classic',
+    image: media.pumaPalermoRose,
+    note: 'An archive icon, styled for the street.',
   },
 ];
 
@@ -284,7 +288,7 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="trending section-shell" id="the-edit" aria-label="Trending shoes">
+      <section className="trending section-shell" id="the-edit" aria-label="Trending Puma women’s footwear">
         <div className="section-heading" data-reveal>
           <div>
             <span className="eyebrow">The new edit</span>
@@ -326,11 +330,12 @@ function HomePage() {
         </div>
       </section>
 
-      <section className="statement-panel section-shell" data-reveal>
+      <section className="statement-panel statement-panel--speedcat section-shell" data-reveal>
+        <div className="statement-panel__media" aria-hidden="true"><MediaImage src={media.pumaSpeedcat} alt="" fetchPriority="high" /></div>
         <div className="statement-panel__content">
-          <span className="eyebrow eyebrow--light">Hollywood Shoe / Chapter 02</span>
-          <h2>Good form<br />goes <i>everywhere.</i></h2>
-          <div className="statement-panel__foot"><span>Designed around real life</span><span>— 2026</span></div>
+          <span className="eyebrow eyebrow--light">PUMA® / SPEEDCAT</span>
+          <h2>Red runs<br /><i>the city.</i></h2>
+          <div className="statement-panel__foot"><span>Premium suede / low profile</span><span>Campaign 02</span></div>
         </div>
       </section>
 
@@ -361,16 +366,13 @@ function HomePage() {
           <div className="feature-story__tile feature-story__tile--lower image-frame">
             <MediaImage src={media.pumaSpeedcat} alt="Red PUMA Speedcat premium footwear campaign" fetchPriority="low" />
           </div>
-          <span className="feature-story__line">Icons<br />in motion.</span>
         </div>
       </section>
 
       <section className="final-campaign section-shell" data-reveal>
-        <div className="final-campaign__media" aria-hidden="true"><MediaImage src={media.hero} alt="" loading="lazy" fetchPriority="low" /></div>
+        <div className="final-campaign__media" aria-hidden="true"><MediaImage src={media.pumaMostroCampaign} alt="" fetchPriority="low" /></div>
         <div className="final-campaign__content">
-          <span className="eyebrow eyebrow--light">The next step starts here</span>
-          <h2>Wear the<br /><i>moment.</i></h2>
-          <button className="text-link text-link--light" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>Return to the beginning <ArrowUpRight size={17} /></button>
+          <span className="eyebrow eyebrow--light">PUMA® / MOSTRO</span>
         </div>
       </section>
 
