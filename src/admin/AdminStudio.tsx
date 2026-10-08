@@ -98,6 +98,7 @@ function ImageStudio({ product, onUpdate, onUpload, setMessage, busy, setBusy }:
   const isolated = latest(product.assets, 'isolated');
   const candidate = latest(product.assets, 'candidate');
   const custom = latest(product.assets, 'custom_background');
+  const approvable = candidate || original;
   const processing = async () => {
     if (!original) { setMessage('Upload a source image before beginning the image studio.', true); return; }
     setBusy(true);
@@ -120,9 +121,9 @@ function ImageStudio({ product, onUpdate, onUpload, setMessage, busy, setBusy }:
     try { onUpdate((await api.updateProduct(product.id, { backgroundMode: mode })).product); } catch (error) { setMessage(error instanceof Error ? error.message : 'Could not update background mode.', true); } finally { setBusy(false); }
   };
   const approve = async () => {
-    if (!candidate) return;
+    if (!approvable) return;
     setBusy(true);
-    try { onUpdate((await api.approve(product.id, candidate.id)).product); setMessage('The selected premium result is now approved.'); } catch (error) { setMessage(error instanceof Error ? error.message : 'Could not approve this image.', true); } finally { setBusy(false); }
+    try { onUpdate((await api.approve(product.id, approvable.id)).product); setMessage(candidate ? 'The selected premium result is now approved.' : 'The original image is selected for this release.'); } catch (error) { setMessage(error instanceof Error ? error.message : 'Could not approve this image.', true); } finally { setBusy(false); }
   };
   return (
     <section className="admin-section admin-image-studio" aria-labelledby="image-studio-title">
@@ -140,14 +141,14 @@ function ImageStudio({ product, onUpdate, onUpload, setMessage, busy, setBusy }:
           {original && <UploadWell product={product} onUpload={onUpload} busy={busy} />}
         </div>
         <div className="image-worktable__result">
-          <div className="image-label"><span>Hollywood Shoe premium result</span>{candidate?.isApproved ? <em className="approved-tag"><Check size={13} /> Approved</em> : <em>Review required</em>}</div>
+          <div className="image-label"><span>Hollywood Shoe premium result</span>{candidate?.isApproved || (!candidate && original?.isApproved) ? <em className="approved-tag"><Check size={13} /> Approved</em> : <em>Review required</em>}</div>
           <div className="studio-result">
             {candidate ? <img src={candidate.url} alt="Premium generated product candidate" /> : <div className="studio-result__empty"><Sparkles size={24} /><strong>Ready for a more considered setting.</strong><span>Process your original to create the first review candidate.</span></div>}
             {stage !== null && <div className="studio-result__processing"><span>Preparing</span><strong>{pipeline[stage]}…</strong><i /></div>}
           </div>
           <div className="image-actions">
             <button className="admin-button admin-button--quiet" onClick={processing} disabled={busy || !original}><RefreshCcw size={16} /> {candidate ? 'Regenerate' : 'Create premium result'}</button>
-            <button className="admin-button admin-button--primary" onClick={approve} disabled={busy || !candidate || candidate.isApproved}><Check size={16} /> {candidate?.isApproved ? 'Image approved' : 'Approve this image'}</button>
+            <button className="admin-button admin-button--primary" onClick={approve} disabled={busy || !approvable || approvable.isApproved}><Check size={16} /> {approvable?.isApproved ? 'Image approved' : candidate ? 'Approve this image' : 'Use original image'}</button>
           </div>
         </div>
       </div>

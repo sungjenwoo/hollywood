@@ -266,7 +266,7 @@ export async function findLatestAsset(productId: string, kinds: AssetKind[]): Pr
 
 export async function approveAsset(productId: string, assetId: string): Promise<ProductWithAssets> {
   const asset = (await getProduct(productId))?.assets.find((entry) => entry.id === assetId);
-  if (!asset || !['candidate', 'approved'].includes(asset.kind)) throw new Error('Choose a valid generated image to approve.');
+  if (!asset || !['original', 'candidate', 'approved'].includes(asset.kind)) throw new Error('Choose a valid product image to use for this release.');
   await getPool().execute('UPDATE hs_product_assets SET is_approved = FALSE WHERE product_id = ?', [productId]);
   await getPool().execute('UPDATE hs_product_assets SET is_approved = TRUE WHERE id = ?', [assetId]);
   await getPool().execute('UPDATE hs_products SET primary_asset_id = ? WHERE id = ?', [assetId, productId]);

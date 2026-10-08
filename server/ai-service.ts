@@ -16,10 +16,13 @@ async function imageRequest(prompt: string, originals: Array<{ url: string; mime
     headers: { authorization: `Bearer ${key}`, 'content-type': 'application/json', 'connect-protocol-version': '1' },
     body: JSON.stringify({ prompt, originalImages: originals }),
   });
-  const body = await response.json() as { image?: { url?: string; b64Json?: string; mimeType?: string }; error?: { message?: string } | string };
+  const body = await response.json() as { image?: { url?: string; b64Json?: string; mimeType?: string }; error?: { message?: string } | string; message?: string };
   if (!response.ok || !body.image) {
-    const message = typeof body.error === 'string' ? body.error : body.error?.message;
-    throw new Error(message || 'AI image processing did not complete. Please retry.');
+    const message = typeof body.error === 'string' ? body.error : body.error?.message || body.message;
+    if (message?.toLowerCase().includes('usage exhausted')) {
+      throw new Error('The managed premium-image service is currently unavailable. You can use the original product image for this release or retry the premium result later.');
+    }
+    throw new Error(message || 'AI image processing did not complete. You can use the original product image or retry.');
   }
   return body.image;
 }
