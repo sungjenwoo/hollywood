@@ -94,11 +94,17 @@ function ImageStudio({ product, onUpdate, onUpload, setMessage, busy, setBusy }:
 }) {
   const customInput = useRef<HTMLInputElement>(null);
   const [stage, setStage] = useState<number | null>(null);
+  const [selectedCandidateId, setSelectedCandidateId] = useState<string | null>(null);
   const original = latest(product.assets, 'original');
   const isolated = latest(product.assets, 'isolated');
-  const candidate = latest(product.assets, 'candidate');
+  const candidates = product.assets.filter((asset) => asset.kind === 'candidate');
+  const candidate = candidates.find((asset) => asset.id === selectedCandidateId) || latest(product.assets, 'candidate');
   const custom = latest(product.assets, 'custom_background');
   const approvable = candidate || original;
+  const localComposition = candidate?.metadata.provider === 'local-studio';
+  useEffect(() => {
+    if (!selectedCandidateId || !candidates.some((asset) => asset.id === selectedCandidateId)) setSelectedCandidateId(candidates.at(-1)?.id || null);
+  }, [product.id, candidates.length, selectedCandidateId]);
   const processing = async () => {
     if (!original) { setMessage('Upload a source image before beginning the image studio.', true); return; }
     setBusy(true);
@@ -107,7 +113,7 @@ function ImageStudio({ product, onUpdate, onUpload, setMessage, busy, setBusy }:
     try {
       const { product: next } = await api.processImages(product.id);
       onUpdate(next);
-      setMessage('Premium result ready for review. Approve it only when it feels right.');
+      setMessage('A new premium result is ready for review. Every generation is kept as its own candidate.');
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'The image studio could not finish this result.', true);
     } finally {
@@ -129,7 +135,7 @@ function ImageStudio({ product, onUpdate, onUpload, setMessage, busy, setBusy }:
     <section className="admin-section admin-image-studio" aria-labelledby="image-studio-title">
       <div className="admin-section__lead">
         <div><p className="admin-kicker">01 — Image studio</p><h2 id="image-studio-title">Turn a shoe photo into a <i>considered</i> first impression.</h2></div>
-        <p>The original remains untouched. Every AI result is a reviewable candidate until you explicitly approve it.</p>
+        <p>The original remains untouched. Every creation is kept as a reviewable candidate until you explicitly approve one—POST sets no generation-count cap.</p>
       </div>
       <div className="pipeline-ribbon" aria-label="Image pipeline progress">
         {pipeline.map((label, index) => <span key={label} className={stage !== null && index <= stage ? 'pipeline-ribbon__step pipeline-ribbon__step--active' : 'pipeline-ribbon__step'}><b>0{index + 1}</b>{label}</span>)}
@@ -146,8 +152,10 @@ function ImageStudio({ product, onUpdate, onUpload, setMessage, busy, setBusy }:
             {candidate ? <img src={candidate.url} alt="Premium generated product candidate" /> : <div className="studio-result__empty"><Sparkles size={24} /><strong>Ready for a more considered setting.</strong><span>Process your original to create the first review candidate.</span></div>}
             {stage !== null && <div className="studio-result__processing"><span>Preparing</span><strong>{pipeline[stage]}…</strong><i /></div>}
           </div>
+          {localComposition && <p className="local-composition-note">A local studio composition was created from your source image because the external AI provider is unavailable. It is durable and reviewable, but not an AI-restyled cutout.</p>}
+          {candidates.length > 1 && <div className="candidate-strip" aria-label="Premium result candidates"><span>{candidates.length} saved candidates</span><div>{candidates.map((asset, index) => <button key={asset.id} className={asset.id === candidate?.id ? 'candidate-strip__item candidate-strip__item--selected' : 'candidate-strip__item'} onClick={() => setSelectedCandidateId(asset.id)} aria-label={`Review premium candidate ${index + 1}`} aria-pressed={asset.id === candidate?.id}><img src={asset.url} alt="" /><small>{asset.isApproved ? 'Approved' : `Result ${index + 1}`}</small></button>)}</div></div>}
           <div className="image-actions">
-            <button className="admin-button admin-button--quiet" onClick={processing} disabled={busy || !original}><RefreshCcw size={16} /> {candidate ? 'Regenerate' : 'Create premium result'}</button>
+            <button className="admin-button admin-button--quiet" onClick={processing} disabled={busy || !original}><RefreshCcw size={16} /> {candidate ? 'Create another result' : 'Create premium result'}</button>
             <button className="admin-button admin-button--primary" onClick={approve} disabled={busy || !approvable || approvable.isApproved}><Check size={16} /> {approvable?.isApproved ? 'Image approved' : candidate ? 'Approve this image' : 'Use original image'}</button>
           </div>
         </div>

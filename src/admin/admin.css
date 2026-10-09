@@ -84,6 +84,14 @@
 .studio-result__processing strong { font-family:'DM Serif Display',Georgia,serif; font-size:26px; font-weight:400; letter-spacing:-.03em; margin-top:4px; }
 .studio-result__processing i { background:rgba(255,253,248,.26); height:2px; margin-top:14px; overflow:hidden; position:relative; }
 .studio-result__processing i::after { animation:admin-progress 1.25s ease-in-out infinite; background:var(--admin-white); content:''; height:100%; left:-45%; position:absolute; top:0; width:45%; }
+.candidate-strip { align-items:center; border-top:1px solid rgba(32,29,27,.12); display:flex; gap:18px; margin-top:14px; padding-top:14px; }
+.candidate-strip > span { color:var(--admin-muted); flex:0 0 88px; font-size:8px; font-weight:700; letter-spacing:.12em; line-height:1.45; text-transform:uppercase; }
+.candidate-strip > div { display:flex; gap:9px; min-width:0; overflow-x:auto; padding-bottom:2px; }
+.candidate-strip__item { background:transparent; border:1px solid transparent; color:var(--admin-muted); display:grid; font-size:8px; gap:4px; letter-spacing:.06em; min-width:58px; padding:3px; text-align:left; }
+.candidate-strip__item img { aspect-ratio:1; display:block; object-fit:cover; width:56px; }
+.candidate-strip__item--selected { border-color:var(--admin-ink); color:var(--admin-ink); }
+.candidate-strip__item:focus-visible { outline:2px solid var(--admin-oxblood); outline-offset:2px; }
+.local-composition-note { background:#efe8dd; border-left:2px solid var(--admin-oxblood); color:var(--admin-muted); font-size:10px; line-height:1.55; margin:14px 0 0; padding:11px 13px; }
 @keyframes admin-progress { to { left:100%; } }
 .image-actions { display:flex; gap:9px; justify-content:flex-end; margin-top:12px; }
 .studio-upload { margin-top:12px; }
