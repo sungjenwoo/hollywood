@@ -26,7 +26,7 @@ const media = {
   pumaSpeedcat: '/manus-storage/puma-speedcat-campaign_c8fb936a.jpg',
   pumaSpeedcatProduct: '/manus-storage/qgC7VqnT1nFO_d452084c.jpg',
   pumaSpeedcatBlack: '/manus-storage/Gj7VLG5izFC9_8ef2cba7.jpeg',
-  pumaMostro: '/manus-storage/n4hFawkiDM6d_68d4315f.jpg',
+  pumaPalermoGreen: '/manus-storage/qYEvXt7LBI9m_efe88e65.jpg',
   pumaPalermoRose: '/manus-storage/J026xMeLSvJv_6b0cbcfe.jpg',
   pumaMostroCampaign: '/manus-storage/qTTcEUee3T6s_69420c33.jpg',
 };
@@ -69,11 +69,11 @@ const shoes = [
     note: 'A clean, close-to-ground line with motorsport roots.',
   },
   {
-    name: 'Mostro',
-    category: '02 / Textured grip',
-    image: media.pumaMostro,
-    imageClass: 'shoe-product--mostro',
-    note: 'An offbeat profile with a sculpted, spiked sole.',
+    name: 'Palermo',
+    category: '02 / Green terrace form',
+    image: media.pumaPalermoGreen,
+    imageClass: 'shoe-product--palermo-green',
+    note: 'A deep green terrace silhouette with a low, easy line.',
   },
   {
     name: 'Palermo 0161',

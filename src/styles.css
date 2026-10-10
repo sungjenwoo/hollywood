@@ -97,7 +97,7 @@ h1 i, h2 i { font-weight: 400; }
 .shoe-card__image { aspect-ratio: 4 / 5; display: block; }
 .shoe-card__image img { height: 100%; object-fit: cover; transition: transform 800ms var(--ease), filter 500ms var(--ease); width: 100%; }
 .shoe-product--speedcat { object-position: center 76%; }
-.shoe-product--mostro { object-position: center 59%; }
+.shoe-product--palermo-green { object-position: center center; }
 .shoe-product--palermo { object-position: 62% center; }
 .shoe-card:hover .shoe-card__image img, .shoe-card--active .shoe-card__image img { transform: scale(1.05); }
 .shoe-card:not(.shoe-card--active) .shoe-card__image img { filter: saturate(.85) contrast(.96); }
