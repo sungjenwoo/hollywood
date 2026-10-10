@@ -6,6 +6,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   ChevronDown,
+  Heart,
   Info,
   Menu,
   SlidersHorizontal,
@@ -428,22 +429,53 @@ function readMensFilters(): { lens: MensLens; price: MensPriceFilter; sort: Mens
   return { lens, price, sort };
 }
 
+function WishlistButton({ productId, productName }: { productId: string; productName: string }) {
+  const storageKey = 'hollywood-shoe-wishlist';
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(window.localStorage.getItem(storageKey) || '[]') as string[];
+      setSaved(stored.includes(productId));
+    } catch {
+      setSaved(false);
+    }
+  }, [productId]);
+
+  const toggle = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    try {
+      const stored = JSON.parse(window.localStorage.getItem(storageKey) || '[]') as string[];
+      const next = saved ? stored.filter((id) => id !== productId) : [...new Set([...stored, productId])];
+      window.localStorage.setItem(storageKey, JSON.stringify(next));
+      setSaved(!saved);
+    } catch {
+      setSaved(!saved);
+    }
+  };
+
+  return <button className={`mens-wishlist ${saved ? 'mens-wishlist--saved' : ''}`} onClick={toggle} aria-label={`${saved ? 'Remove' : 'Save'} ${productName} ${saved ? 'from' : 'to'} wishlist`} aria-pressed={saved}><Heart size={17} strokeWidth={1.4} fill={saved ? 'currentColor' : 'none'} /></button>;
+}
+
 function MensProductCard({ product, index }: { product: PublicProduct; index: number }) {
   const image = product.imageUrl;
   return (
-    <a className="mens-product-card" href={`/mens/${product.id}`} onClick={(event) => { event.preventDefault(); navigate(`/mens/${product.id}`); }}>
+    <article className="mens-product-card">
       <div className="mens-product-card__image">
-        {image ? <img src={image} alt={product.name} loading={index < 4 ? 'eager' : 'lazy'} decoding="async" onError={(event) => event.currentTarget.classList.add('media-failed')} /> : <span className="mens-product-card__missing">Image coming soon</span>}
-        <span className="mens-product-card__index">0{String(index + 1).slice(-2)}</span>
+        <a className="mens-product-card__image-link" href={`/mens/${product.id}`} onClick={(event) => { event.preventDefault(); navigate(`/mens/${product.id}`); }} aria-label={`Open ${product.name}`}>
+          {image ? <img src={image} alt={product.name} loading={index < 4 ? 'eager' : 'lazy'} decoding="async" onError={(event) => event.currentTarget.classList.add('media-failed')} /> : <span className="mens-product-card__missing">Image coming soon</span>}
+        </a>
+        <WishlistButton productId={product.id} productName={product.name} />
         {product.badges[0] && <span className="mens-product-card__badge">{product.badges[0]}</span>}
       </div>
       <div className="mens-product-card__meta">
-        <span>{product.productType || 'Footwear'}{product.trending ? ' · Trending' : ''}</span>
-        <strong>{product.name || 'Hollywood Shoe release'}</strong>
-        <p>{product.shortDescription || product.description}</p>
-        <div className="mens-product-card__price"><b>{formatInr(productPrice(product))}</b>{product.salePrice !== null && product.originalPrice !== null && <del>{formatInr(product.originalPrice)}</del>}</div>
+        <a href={`/mens/${product.id}`} onClick={(event) => { event.preventDefault(); navigate(`/mens/${product.id}`); }}>
+          <strong>{product.name || 'Hollywood Shoe release'}</strong>
+        </a>
+        <div className="mens-product-card__bottom"><div className="mens-product-card__price"><b>{formatInr(productPrice(product))}</b>{product.salePrice !== null && product.originalPrice !== null && <del>{formatInr(product.originalPrice)}</del>}</div></div>
       </div>
-    </a>
+    </article>
   );
 }
 
@@ -486,15 +518,6 @@ function MensCollectionPage() {
     window.history.replaceState({}, '', `${url.pathname}${url.search}`);
   }, [lens, price, sort]);
 
-  const lensItems: Array<{ id: MensLens; label: string; note: string; product?: PublicProduct }> = [
-    { id: 'all', label: 'All sneakers', note: 'The complete edit', product: products[0] },
-    { id: 'trending', label: 'Trending', note: 'Marked by the house', product: products.find((product) => product.trending) },
-    { id: 'new', label: 'New arrivals', note: 'Recently released', product: products.find((product) => product.badges.includes('NEW')) },
-    { id: 'sale', label: 'Sale edit', note: 'Reduced releases', product: products.find((product) => product.salePrice !== null) },
-    { id: 'stock', label: 'In stock', note: 'Available sizes', product: products.find(hasStock) },
-    { id: 'published', label: 'Published edit', note: 'The current chapter', product: products[products.length - 1] },
-  ];
-
   const visibleProducts = useMemo(() => products.filter((product) => {
     const currentPrice = productPrice(product);
     const lensPass = lens === 'all' || lens === 'published' || (lens === 'trending' && product.trending) || (lens === 'new' && product.badges.includes('NEW')) || (lens === 'sale' && product.salePrice !== null) || (lens === 'stock' && hasStock(product));
@@ -512,23 +535,15 @@ function MensCollectionPage() {
   const clearFilters = () => { setLens('all'); setPrice('all'); setSort('featured'); };
 
   return (
-    <main className="mens-collection-page">
-      <section className="mens-collection-intro">
-        <div className="mens-collection-intro__brand"><span className="eyebrow">Hollywood Shoe / 02</span><strong>HOLLYWOOD</strong><small>SHOES</small></div>
-        <div className="mens-collection-intro__copy"><h1>Men&apos;s shoes</h1><p>A considered edit of published sneakers, built around real product information and the pace of everyday movement.</p></div>
-      </section>
-      <section className="mens-lens-section" aria-labelledby="mens-lens-title">
-        <div className="mens-section-line"><span className="eyebrow" id="mens-lens-title">Browse the edit</span><span>{products.length} published {products.length === 1 ? 'style' : 'styles'}</span></div>
-        <div className="mens-lens-rail">
-          {lensItems.map((item) => <button key={item.id} className={`mens-lens ${lens === item.id ? 'mens-lens--active' : ''}`} onClick={() => setLens(item.id)} aria-pressed={lens === item.id}>
-            <span className="mens-lens__image">{item.product?.imageUrl ? <img src={item.product.imageUrl} alt="" loading="lazy" /> : <span className="mens-lens__empty">—</span>}</span>
-            <span className="mens-lens__label"><strong>{item.label}</strong><small>{item.note}</small></span>
-          </button>)}
-        </div>
+    <main className="mens-collection-page mens-grid-page">
+      <section className="mens-grid-heading">
+        <div><span className="eyebrow">Hollywood Shoe / Men&apos;s collection</span><h1>Men&apos;s footwear</h1></div>
+        <div className="mens-grid-heading__count"><span className="eyebrow">Published edit</span><strong>{products.length} styles</strong></div>
       </section>
       <section className="mens-toolbar" aria-label="Collection filters">
         <div className="mens-toolbar__count"><strong>{visibleProducts.length}</strong><span>of {products.length} styles</span></div>
         <div className="mens-toolbar__controls">
+          <label><span>View</span><select value={lens} onChange={(event) => setLens(event.target.value as MensLens)}><option value="all">All sneakers</option><option value="trending">Trending</option><option value="new">New arrivals</option><option value="sale">Sale edit</option><option value="stock">In stock</option><option value="published">Published edit</option></select><ChevronDown size={14} /></label>
           <label><span>Price</span><select value={price} onChange={(event) => setPrice(event.target.value as MensPriceFilter)}><option value="all">All prices</option><option value="under3000">Under ₹3,000</option><option value="3000to6000">₹3,000 – ₹6,000</option><option value="over6000">Over ₹6,000</option></select><ChevronDown size={14} /></label>
           <label><span>Sort by</span><select value={sort} onChange={(event) => setSort(event.target.value as MensSort)}><option value="featured">Featured</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option><option value="name">Name</option></select><ChevronDown size={14} /></label>
           {(lens !== 'all' || price !== 'all' || sort !== 'featured') && <button className="mens-clear" onClick={clearFilters}><SlidersHorizontal size={14} /> Clear filters</button>}

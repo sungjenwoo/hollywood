@@ -21,3 +21,13 @@
 - [x] **Inventory-backed detail interactions:** Use stored inventory for size choices and availability; provide an honest size-guide explanation; do not show fictional sizes, colors, wishlist, cart, delivery or care claims when the backend does not support them.
 - [x] **Responsive and accessible Men’s experience:** Validate desktop, tablet and mobile layouts, touch-friendly controls, keyboard navigation, alt text, visible focus states, reduced-motion behavior, image loading and runtime/console errors.
 - [x] **Men’s route/API verification:** Add and serve `/mens/:id` in the route manifest, verify public collection/detail APIs and approved media responses, run the production build, and preserve the existing Home route behavior.
+
+
+## Men’s Product-Grid Reference Refinement
+
+- [x] **Preserve project scope:** Reuse the existing Men’s route, public product API, approved product assets, detail links, navigation, and framework; do not alter the Home page, Home content, or Home styling.
+- [x] **Reference-led desktop grid:** Deliver a four-column Men’s product grid where viewport and product count permit, using clean neutral image wells, consistent image proportions, subtle vertical separations, compact product information beneath images, and no oversized editorial block above the products.
+- [x] **Real product information:** Show actual published product names, approved imagery, stored INR prices and badges; retain product-image/name links to the corresponding direct detail route.
+- [x] **Honest color treatment:** Inspect the product model for color variants; because no variants are stored, do not invent color swatches and state the limitation visibly.
+- [x] **Wishlist interaction:** Add unobtrusive upper-right heart controls that toggle a persistent device-local saved state without blocking the product-detail link.
+- [x] **Responsive and functional validation:** Verify desktop, tablet, and mobile composition, API/image responses, direct product routing, saved-heart behavior, route manifest validity, no horizontal-overflow hacks, and a clean production build.
