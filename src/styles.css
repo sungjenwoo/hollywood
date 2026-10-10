@@ -285,3 +285,140 @@ h1 i, h2 i { font-weight: 400; }
   [data-reveal] { opacity: 1; transform: none; }
   .final-campaign__media img { transform: none; }
 }
+
+
+/* Men’s collection and detail views only. Home styles above remain unchanged. */
+
+
+/* Men’s collection and detail views only. Home styles above remain unchanged. */
+.site-header--collection .brand__type { font-size: 12px; letter-spacing: .2em; }
+.mens-collection-page, .mens-detail-page { background: var(--paper); color: var(--ink); min-height: 100svh; padding: 132px 5vw 100px; }
+.mens-collection-intro { align-items: end; border-bottom: 1px solid rgba(32,29,27,.18); display: grid; gap: 5vw; grid-template-columns: .75fr 1.25fr; padding: 30px 2vw 52px; }
+.mens-collection-intro__brand { display: flex; flex-direction: column; }
+.mens-collection-intro__brand strong { font-family: 'DM Serif Display', Georgia, serif; font-size: clamp(54px, 7vw, 106px); font-weight: 400; letter-spacing: -.07em; line-height: .78; margin-top: 30px; }
+.mens-collection-intro__brand small { font-size: 10px; font-weight: 700; letter-spacing: .24em; margin: 14px 0 0 4px; }
+.mens-collection-intro__copy { max-width: 640px; }
+.mens-collection-intro__copy h1 { font-size: clamp(52px, 7vw, 108px); line-height: .86; margin: 0 0 20px; }
+.mens-collection-intro__copy p { color: var(--muted); font-size: 14px; line-height: 1.75; margin: 0; max-width: 400px; }
+.mens-lens-section { padding: 40px 2vw 0; }
+.mens-section-line { align-items: center; display: flex; justify-content: space-between; margin-bottom: 18px; }
+.mens-section-line > span:last-child, .mens-toolbar__count span { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.mens-lens-rail { display: grid; gap: 12px; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+.mens-lens { min-width: 0; padding: 0; text-align: left; }
+.mens-lens__image { aspect-ratio: 1.18 / 1; background: #ece6dd; display: block; overflow: hidden; position: relative; }
+.mens-lens__image::after { border: 1px solid rgba(255,252,247,.7); content: ''; inset: 8px; pointer-events: none; position: absolute; }
+.mens-lens__image img { height: 100%; object-fit: cover; transition: transform 600ms var(--ease), filter 400ms var(--ease); width: 100%; }
+.mens-lens__empty { align-items: center; color: var(--muted); display: flex; font-size: 30px; height: 100%; justify-content: center; }
+.mens-lens__label { border-bottom: 1px solid rgba(32,29,27,.18); display: flex; flex-direction: column; gap: 6px; padding: 12px 2px 14px; }
+.mens-lens__label strong { font-size: 11px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+.mens-lens__label small { color: var(--muted); font-size: 10px; }
+.mens-lens:hover .mens-lens__image img, .mens-lens--active .mens-lens__image img { filter: saturate(1.05); transform: scale(1.05); }
+.mens-lens--active .mens-lens__label { border-bottom: 2px solid var(--oxblood); color: var(--oxblood); }
+.mens-toolbar { align-items: center; border-bottom: 1px solid rgba(32,29,27,.18); display: flex; justify-content: space-between; margin: 45px 2vw 0; padding: 18px 0; }
+.mens-toolbar__count { align-items: baseline; display: flex; gap: 9px; }
+.mens-toolbar__count strong { font-family: 'DM Serif Display', Georgia, serif; font-size: 34px; font-weight: 400; letter-spacing: -.04em; }
+.mens-toolbar__controls { align-items: center; display: flex; gap: 22px; }
+.mens-toolbar__controls label { align-items: center; border-bottom: 1px solid rgba(32,29,27,.35); display: inline-flex; gap: 10px; padding: 7px 0; position: relative; }
+.mens-toolbar__controls label span { color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+.mens-toolbar__controls select { appearance: none; background: transparent; border: 0; color: var(--ink); cursor: pointer; font-size: 11px; min-width: 118px; outline: none; padding-right: 12px; }
+.mens-toolbar__controls label svg { pointer-events: none; position: absolute; right: 0; }
+.mens-clear { align-items: center; color: var(--oxblood); display: inline-flex; font-size: 10px; font-weight: 700; gap: 6px; letter-spacing: .08em; padding: 7px 0; text-transform: uppercase; }
+.mens-data-note { align-items: center; color: var(--muted); display: flex; font-size: 11px; gap: 7px; margin: 20px 2vw 0; }
+.mens-product-grid { display: grid; gap: clamp(18px, 2vw, 30px); grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 28px 2vw 0; }
+.mens-product-card { color: inherit; display: block; min-width: 0; text-decoration: none; }
+.mens-product-card__image { aspect-ratio: 1 / 1.08; background: #f1ece4; overflow: hidden; position: relative; }
+.mens-product-card__image::after { border: 1px solid rgba(255,252,247,.82); content: ''; inset: 10px; pointer-events: none; position: absolute; }
+.mens-product-card__image img { height: 100%; object-fit: contain; transition: transform 800ms var(--ease); width: 100%; }
+.mens-product-card:hover .mens-product-card__image img { transform: scale(1.045); }
+.mens-product-card__missing { align-items: center; color: var(--muted); display: flex; font-size: 10px; height: 100%; justify-content: center; letter-spacing: .1em; text-transform: uppercase; }
+.mens-product-card__index, .mens-product-card__badge { color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .14em; position: absolute; text-transform: uppercase; top: 18px; z-index: 1; }
+.mens-product-card__index { left: 18px; }
+.mens-product-card__badge { color: var(--oxblood); right: 18px; }
+.mens-product-card__meta { display: grid; gap: 8px; padding: 17px 3px 24px; }
+.mens-product-card__meta > span { color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+.mens-product-card__meta strong { font-family: 'DM Serif Display', Georgia, serif; font-size: clamp(23px, 2vw, 31px); font-weight: 400; letter-spacing: -.04em; line-height: .95; }
+.mens-product-card__meta p { color: var(--muted); font-size: 11px; line-height: 1.6; margin: 0; max-width: 270px; }
+.mens-product-card__price { align-items: center; display: flex; gap: 10px; margin-top: 2px; }
+.mens-product-card__price b { font-size: 11px; letter-spacing: .08em; }
+.mens-product-card__price del { color: var(--muted); font-size: 10px; }
+.mens-state { min-height: 48vh; padding: 12vh 2vw 0; }
+.mens-state h2, .mens-state h1 { font-size: clamp(56px, 8vw, 120px); line-height: .84; margin: 24px 0 30px; }
+.mens-detail-page { padding-top: 132px; }
+.mens-detail-breadcrumb { align-items: center; color: var(--muted); display: flex; font-size: 10px; gap: 9px; letter-spacing: .08em; margin: 0 2vw 28px; text-transform: uppercase; }
+.mens-detail-breadcrumb a { color: var(--ink); text-decoration: none; }
+.mens-detail-layout { display: grid; gap: clamp(42px, 7vw, 120px); grid-template-columns: minmax(0, 1.15fr) minmax(360px, .85fr); margin: 0 2vw; }
+.mens-detail-gallery { min-width: 0; }
+.mens-detail-image { aspect-ratio: 1 / 1.04; background: #f0ebe3; overflow: hidden; }
+.mens-detail-image img { height: 100%; object-fit: contain; width: 100%; }
+.mens-detail-thumbnails { display: flex; gap: 10px; margin-top: 12px; }
+.mens-detail-thumb { background: #f0ebe3; border: 1px solid transparent; height: 72px; padding: 0; width: 72px; }
+.mens-detail-thumb--active { border-color: var(--oxblood); }
+.mens-detail-thumb img { height: 100%; object-fit: contain; width: 100%; }
+.mens-detail-info { padding: 8px 0 0; }
+.mens-detail-title { align-items: end; border-bottom: 1px solid rgba(32,29,27,.18); display: flex; gap: 20px; justify-content: space-between; margin-top: 27px; padding-bottom: 24px; }
+.mens-detail-title h1 { font-size: clamp(48px, 5vw, 82px); line-height: .86; margin: 0; max-width: 500px; }
+.mens-detail-price { display: flex; flex-direction: column; flex-shrink: 0; gap: 5px; text-align: right; }
+.mens-detail-price strong { font-size: 14px; letter-spacing: .05em; }
+.mens-detail-price del { color: var(--muted); font-size: 11px; }
+.mens-detail-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 17px; }
+.mens-detail-badges span { border: 1px solid rgba(110,31,46,.35); color: var(--oxblood); font-size: 9px; font-weight: 700; letter-spacing: .12em; padding: 6px 8px; }
+.mens-detail-lede { color: var(--muted); font-size: 14px; line-height: 1.8; margin: 28px 0 30px; max-width: 480px; }
+.mens-detail-rule { background: rgba(32,29,27,.18); height: 1px; margin: 25px 0; width: 100%; }
+.mens-detail-size-heading { align-items: baseline; display: flex; justify-content: space-between; }
+.mens-detail-size-heading strong { font-size: 12px; letter-spacing: .05em; }
+.mens-detail-size-heading span, .mens-detail-muted { color: var(--muted); font-size: 10px; }
+.mens-size-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+.mens-size { background: var(--white); border: 1px solid rgba(32,29,27,.28); font-size: 12px; min-width: 48px; padding: 13px 10px; transition: background 220ms var(--ease), border-color 220ms var(--ease), color 220ms var(--ease); }
+.mens-size:hover:not(:disabled), .mens-size--selected { background: var(--ink); border-color: var(--ink); color: var(--white); }
+.mens-size:disabled { color: #aaa39b; cursor: not-allowed; opacity: .65; text-decoration: line-through; }
+.mens-size-guide { border-bottom: 1px solid rgba(32,29,27,.18); margin-top: 25px; }
+.mens-size-guide summary { align-items: center; cursor: pointer; display: flex; font-size: 11px; font-weight: 700; justify-content: space-between; list-style: none; padding: 15px 0; }
+.mens-size-guide summary::-webkit-details-marker { display: none; }
+.mens-size-guide p { color: var(--muted); font-size: 11px; line-height: 1.7; margin: 0 0 15px; max-width: 420px; }
+.mens-detail-section p { color: var(--muted); font-size: 12px; line-height: 1.75; margin: 15px 0 0; max-width: 520px; }
+.mens-detail-facts { border-bottom: 1px solid rgba(32,29,27,.18); border-top: 1px solid rgba(32,29,27,.18); display: grid; gap: 14px; grid-template-columns: repeat(3, 1fr); margin-top: 29px; padding: 17px 0; }
+.mens-detail-facts div { display: flex; flex-direction: column; gap: 7px; }
+.mens-detail-facts span { color: var(--muted); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; }
+.mens-detail-facts strong { font-size: 11px; font-weight: 600; }
+.mens-detail-note { align-items: flex-start; color: var(--muted); display: flex; font-size: 10px; gap: 9px; line-height: 1.6; margin-top: 24px; max-width: 480px; }
+.mens-detail-note svg { color: var(--oxblood); flex: 0 0 auto; margin-top: 1px; }
+
+@media (max-width: 1050px) {
+  .mens-product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .mens-lens-rail { grid-template-columns: repeat(3, minmax(0, 1fr)); row-gap: 26px; }
+}
+@media (max-width: 760px) {
+  .site-header--collection .brand__type { font-size: 9px; }
+  .mens-collection-page, .mens-detail-page { padding: 108px 7vw 75px; }
+  .mens-collection-intro { display: block; padding: 26px 0 42px; }
+  .mens-collection-intro__brand strong { font-size: clamp(62px, 18vw, 100px); margin-top: 25px; }
+  .mens-collection-intro__copy h1 { font-size: clamp(48px, 15vw, 76px); margin-top: 54px; }
+  .mens-collection-intro__copy p { font-size: 12px; max-width: 290px; }
+  .mens-lens-section { padding: 32px 0 0; }
+  .mens-lens-rail { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none; }
+  .mens-lens-rail::-webkit-scrollbar { display: none; }
+  .mens-lens { flex: 0 0 min(42vw, 190px); }
+  .mens-toolbar { align-items: flex-start; display: block; margin: 30px 0 0; }
+  .mens-toolbar__controls { align-items: stretch; flex-wrap: wrap; gap: 12px 18px; margin-top: 17px; }
+  .mens-toolbar__controls label { flex: 1 1 140px; justify-content: space-between; }
+  .mens-data-note { font-size: 10px; margin: 17px 0 0; }
+  .mens-product-grid { gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 25px 0 0; }
+  .mens-product-card__meta { padding: 13px 2px 22px; }
+  .mens-product-card__meta strong { font-size: 24px; }
+  .mens-product-card__meta p { font-size: 10px; }
+  .mens-product-card__index, .mens-product-card__badge { top: 13px; }
+  .mens-product-card__index { left: 13px; }
+  .mens-product-card__badge { right: 13px; }
+  .mens-detail-breadcrumb { margin: 0 0 22px; overflow: hidden; white-space: nowrap; }
+  .mens-detail-breadcrumb span:last-child { overflow: hidden; text-overflow: ellipsis; }
+  .mens-detail-layout { display: block; margin: 0; }
+  .mens-detail-info { padding-top: 45px; }
+  .mens-detail-title { align-items: start; display: block; }
+  .mens-detail-title h1 { font-size: clamp(48px, 14vw, 75px); }
+  .mens-detail-price { align-items: flex-start; margin-top: 20px; text-align: left; }
+  .mens-detail-lede { font-size: 12px; }
+  .mens-detail-facts { gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mens-lens__image img, .mens-product-card__image img { transition: none; }
+}

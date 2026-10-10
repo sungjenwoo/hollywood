@@ -1,11 +1,14 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type TouchEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type TouchEvent } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
   ArrowDownRight,
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
+  ChevronDown,
+  Info,
   Menu,
+  SlidersHorizontal,
   X,
 } from 'lucide-react';
 import { AdminPostPage } from './admin/AdminStudio';
@@ -27,22 +30,26 @@ const media = {
   pumaMostroCampaign: '/manus-storage/qTTcEUee3T6s_69420c33.jpg',
 };
 
-type Route = '/' | '/mens' | '/womens' | '/kids' | '/post';
+type Route = '/' | '/mens' | `/mens/${string}` | '/womens' | '/kids' | '/post';
 type SectionId = 'home' | 'mens' | 'womens' | 'kids' | 'post';
-type CollectionRoute = Exclude<Route, '/' | '/post'>;
+type FutureCollectionRoute = '/womens' | '/kids';
 
 type PublicProduct = {
   id: string;
   name: string;
   description: string;
+  shortDescription: string;
   productType: string;
+  sku: string;
   category: 'MENS' | 'WOMENS' | 'KIDS';
   originalPrice: number | null;
   salePrice: number | null;
   badges: string[];
   featured: boolean;
   trending: boolean;
+  inventory: Array<{ size: string; quantity: number }>;
   imageUrl: string;
+  images: Array<{ id: string; url: string; alt: string }>;
 };
 
 const navItems: Array<{ label: string; route: Route; id: SectionId }> = [
@@ -78,9 +85,9 @@ const shoes = [
 
 function routeFromLocation(): Route {
   const candidate = window.location.pathname.replace(/\/$/, '') || '/';
-  return (['/', '/mens', '/womens', '/kids', '/post'] as string[]).includes(candidate)
-    ? (candidate as Route)
-    : '/';
+  if (candidate === '/' || candidate === '/mens' || candidate === '/womens' || candidate === '/kids' || candidate === '/post') return candidate as Route;
+  if (/^\/mens\/[^/]+$/.test(candidate)) return candidate as `/mens/${string}`;
+  return '/';
 }
 
 function navigate(route: Route) {
@@ -116,9 +123,10 @@ function Header({ route }: { route: Route }) {
   };
 
   const headerNav = [...navItems, { label: 'POST', route: '/post' as Route, id: 'post' as SectionId }];
+  const mensRoute = route === '/mens' || route.startsWith('/mens/');
 
   return (
-    <header className={`site-header ${isScrolled || route !== '/' ? 'site-header--solid' : ''}`}>
+    <header className={`site-header ${isScrolled || route !== '/' ? 'site-header--solid' : ''} ${route !== '/' ? 'site-header--collection' : ''}`}>
       <button className="brand" onClick={() => selectRoute('/')} aria-label="Hollywood Shoe Home">
         <span className="brand__mark" aria-hidden="true"><i /><i /><b /></span>
         <span className="brand__type">HOLLYWOOD<br />SHOE</span>
@@ -128,9 +136,9 @@ function Header({ route }: { route: Route }) {
         {headerNav.map((item) => (
           <button
             key={item.id}
-            className={`nav-link ${route === item.route ? 'nav-link--active' : ''}`}
+            className={`nav-link ${route === item.route || (item.route === '/mens' && mensRoute) ? 'nav-link--active' : ''}`}
             onClick={() => selectRoute(item.route)}
-            aria-current={route === item.route ? 'page' : undefined}
+            aria-current={route === item.route || (item.route === '/mens' && mensRoute) ? 'page' : undefined}
           >
             {item.label}
             {(item.route === '/womens' || item.route === '/kids') && <span className="nav-link__future" aria-label="Future chapter">SOON</span>}
@@ -154,7 +162,7 @@ function Header({ route }: { route: Route }) {
             {headerNav.map((item, index) => (
               <button
                 key={item.id}
-                className={`mobile-nav-link ${route === item.route ? 'mobile-nav-link--active' : ''}`}
+                className={`mobile-nav-link ${route === item.route || (item.route === '/mens' && mensRoute) ? 'mobile-nav-link--active' : ''}`}
                 onClick={() => selectRoute(item.route)}
                 tabIndex={isMenuOpen ? 0 : -1}
               >
@@ -404,7 +412,182 @@ function HomePage() {
   );
 }
 
-function CollectionPage({ route }: { route: CollectionRoute }) {
+type MensLens = 'all' | 'trending' | 'new' | 'sale' | 'stock' | 'published';
+type MensPriceFilter = 'all' | 'under3000' | '3000to6000' | 'over6000';
+type MensSort = 'featured' | 'price-asc' | 'price-desc' | 'name';
+
+const formatInr = (value: number | null) => value === null ? 'Price on request' : new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(value);
+const productPrice = (product: PublicProduct) => product.salePrice ?? product.originalPrice;
+const hasStock = (product: PublicProduct) => product.inventory.some((item) => item.quantity > 0);
+
+function readMensFilters(): { lens: MensLens; price: MensPriceFilter; sort: MensSort } {
+  const params = new URLSearchParams(window.location.search);
+  const lens = ['all', 'trending', 'new', 'sale', 'stock', 'published'].includes(params.get('lens') || '') ? params.get('lens') as MensLens : 'all';
+  const price = ['all', 'under3000', '3000to6000', 'over6000'].includes(params.get('price') || '') ? params.get('price') as MensPriceFilter : 'all';
+  const sort = ['featured', 'price-asc', 'price-desc', 'name'].includes(params.get('sort') || '') ? params.get('sort') as MensSort : 'featured';
+  return { lens, price, sort };
+}
+
+function MensProductCard({ product, index }: { product: PublicProduct; index: number }) {
+  const image = product.imageUrl;
+  return (
+    <a className="mens-product-card" href={`/mens/${product.id}`} onClick={(event) => { event.preventDefault(); navigate(`/mens/${product.id}`); }}>
+      <div className="mens-product-card__image">
+        {image ? <img src={image} alt={product.name} loading={index < 4 ? 'eager' : 'lazy'} decoding="async" onError={(event) => event.currentTarget.classList.add('media-failed')} /> : <span className="mens-product-card__missing">Image coming soon</span>}
+        <span className="mens-product-card__index">0{String(index + 1).slice(-2)}</span>
+        {product.badges[0] && <span className="mens-product-card__badge">{product.badges[0]}</span>}
+      </div>
+      <div className="mens-product-card__meta">
+        <span>{product.productType || 'Footwear'}{product.trending ? ' · Trending' : ''}</span>
+        <strong>{product.name || 'Hollywood Shoe release'}</strong>
+        <p>{product.shortDescription || product.description}</p>
+        <div className="mens-product-card__price"><b>{formatInr(productPrice(product))}</b>{product.salePrice !== null && product.originalPrice !== null && <del>{formatInr(product.originalPrice)}</del>}</div>
+      </div>
+    </a>
+  );
+}
+
+function MensCollectionPage() {
+  const initial = readMensFilters();
+  const [products, setProducts] = useState<PublicProduct[]>([]);
+  const [lens, setLens] = useState<MensLens>(initial.lens);
+  const [price, setPrice] = useState<MensPriceFilter>(initial.price);
+  const [sort, setSort] = useState<MensSort>(initial.sort);
+  const [loading, setLoading] = useState(true);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setFailed(false);
+    fetch('/api/products?category=MENS')
+      .then((response) => { if (!response.ok) throw new Error('Collection unavailable'); return response.json() as Promise<{ products: PublicProduct[] }>; })
+      .then((data) => { if (active) setProducts(data.products); })
+      .catch(() => { if (active) setFailed(true); })
+      .finally(() => { if (active) setLoading(false); });
+    return () => { active = false; };
+  }, []);
+
+  useEffect(() => {
+    const updateFromUrl = () => {
+      if (window.location.pathname !== '/mens') return;
+      const next = readMensFilters();
+      setLens(next.lens); setPrice(next.price); setSort(next.sort);
+    };
+    window.addEventListener('popstate', updateFromUrl);
+    return () => window.removeEventListener('popstate', updateFromUrl);
+  }, []);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    lens === 'all' ? url.searchParams.delete('lens') : url.searchParams.set('lens', lens);
+    price === 'all' ? url.searchParams.delete('price') : url.searchParams.set('price', price);
+    sort === 'featured' ? url.searchParams.delete('sort') : url.searchParams.set('sort', sort);
+    window.history.replaceState({}, '', `${url.pathname}${url.search}`);
+  }, [lens, price, sort]);
+
+  const lensItems: Array<{ id: MensLens; label: string; note: string; product?: PublicProduct }> = [
+    { id: 'all', label: 'All sneakers', note: 'The complete edit', product: products[0] },
+    { id: 'trending', label: 'Trending', note: 'Marked by the house', product: products.find((product) => product.trending) },
+    { id: 'new', label: 'New arrivals', note: 'Recently released', product: products.find((product) => product.badges.includes('NEW')) },
+    { id: 'sale', label: 'Sale edit', note: 'Reduced releases', product: products.find((product) => product.salePrice !== null) },
+    { id: 'stock', label: 'In stock', note: 'Available sizes', product: products.find(hasStock) },
+    { id: 'published', label: 'Published edit', note: 'The current chapter', product: products[products.length - 1] },
+  ];
+
+  const visibleProducts = useMemo(() => products.filter((product) => {
+    const currentPrice = productPrice(product);
+    const lensPass = lens === 'all' || lens === 'published' || (lens === 'trending' && product.trending) || (lens === 'new' && product.badges.includes('NEW')) || (lens === 'sale' && product.salePrice !== null) || (lens === 'stock' && hasStock(product));
+    const pricePass = price === 'all' || (currentPrice !== null && ((price === 'under3000' && currentPrice < 3000) || (price === '3000to6000' && currentPrice >= 3000 && currentPrice <= 6000) || (price === 'over6000' && currentPrice > 6000)));
+    return lensPass && pricePass;
+  }).sort((a, b) => {
+    if (sort === 'name') return a.name.localeCompare(b.name);
+    const aPrice = productPrice(a) ?? Number.POSITIVE_INFINITY;
+    const bPrice = productPrice(b) ?? Number.POSITIVE_INFINITY;
+    if (sort === 'price-asc') return aPrice - bPrice;
+    if (sort === 'price-desc') return bPrice - aPrice;
+    return Number(b.featured) - Number(a.featured) || Number(b.trending) - Number(a.trending);
+  }), [lens, price, products, sort]);
+
+  const clearFilters = () => { setLens('all'); setPrice('all'); setSort('featured'); };
+
+  return (
+    <main className="mens-collection-page">
+      <section className="mens-collection-intro">
+        <div className="mens-collection-intro__brand"><span className="eyebrow">Hollywood Shoe / 02</span><strong>HOLLYWOOD</strong><small>SHOES</small></div>
+        <div className="mens-collection-intro__copy"><h1>Men&apos;s shoes</h1><p>A considered edit of published sneakers, built around real product information and the pace of everyday movement.</p></div>
+      </section>
+      <section className="mens-lens-section" aria-labelledby="mens-lens-title">
+        <div className="mens-section-line"><span className="eyebrow" id="mens-lens-title">Browse the edit</span><span>{products.length} published {products.length === 1 ? 'style' : 'styles'}</span></div>
+        <div className="mens-lens-rail">
+          {lensItems.map((item) => <button key={item.id} className={`mens-lens ${lens === item.id ? 'mens-lens--active' : ''}`} onClick={() => setLens(item.id)} aria-pressed={lens === item.id}>
+            <span className="mens-lens__image">{item.product?.imageUrl ? <img src={item.product.imageUrl} alt="" loading="lazy" /> : <span className="mens-lens__empty">—</span>}</span>
+            <span className="mens-lens__label"><strong>{item.label}</strong><small>{item.note}</small></span>
+          </button>)}
+        </div>
+      </section>
+      <section className="mens-toolbar" aria-label="Collection filters">
+        <div className="mens-toolbar__count"><strong>{visibleProducts.length}</strong><span>of {products.length} styles</span></div>
+        <div className="mens-toolbar__controls">
+          <label><span>Price</span><select value={price} onChange={(event) => setPrice(event.target.value as MensPriceFilter)}><option value="all">All prices</option><option value="under3000">Under ₹3,000</option><option value="3000to6000">₹3,000 – ₹6,000</option><option value="over6000">Over ₹6,000</option></select><ChevronDown size={14} /></label>
+          <label><span>Sort by</span><select value={sort} onChange={(event) => setSort(event.target.value as MensSort)}><option value="featured">Featured</option><option value="price-asc">Price: low to high</option><option value="price-desc">Price: high to low</option><option value="name">Name</option></select><ChevronDown size={14} /></label>
+          {(lens !== 'all' || price !== 'all' || sort !== 'featured') && <button className="mens-clear" onClick={clearFilters}><SlidersHorizontal size={14} /> Clear filters</button>}
+        </div>
+      </section>
+      <p className="mens-data-note"><Info size={14} /> Color variants are not stored for the current published Men&apos;s inventory, so no fictional swatches are shown.</p>
+      {loading ? <div className="mens-state"><span className="eyebrow">Loading the Men&apos;s edit…</span></div> : failed ? <div className="mens-state"><span className="eyebrow">The collection is temporarily unavailable.</span><button className="text-link" onClick={() => window.location.reload()}>Try again <ArrowRight size={17} /></button></div> : visibleProducts.length ? <section className="mens-product-grid" aria-label="Men’s shoes">{visibleProducts.map((product, index) => <MensProductCard key={product.id} product={product} index={index} />)}</section> : <section className="mens-state mens-state--empty"><span className="eyebrow">No styles in this lens</span><h2>The edit is<br /><i>quiet here.</i></h2><button className="text-link" onClick={clearFilters}>Return to all sneakers <ArrowRight size={17} /></button></section>}
+    </main>
+  );
+}
+
+function MensProductDetailPage({ productId }: { productId: string }) {
+  const [product, setProduct] = useState<PublicProduct | null>(null);
+  const [imageIndex, setImageIndex] = useState(0);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    let active = true;
+    fetch(`/api/products/${encodeURIComponent(productId)}`)
+      .then((response) => { if (!response.ok) throw new Error('Product unavailable'); return response.json() as Promise<{ product: PublicProduct }>; })
+      .then((data) => { if (active) setProduct(data.product); })
+      .catch(() => { if (active) setFailed(true); });
+    return () => { active = false; };
+  }, [productId]);
+
+  if (failed) return <main className="mens-detail-page mens-state"><span className="eyebrow">This release could not be found.</span><h1>Return to the<br /><i>Men&apos;s edit.</i></h1><a className="text-link" href="/mens">Back to Men&apos;s shoes <ArrowLeft size={17} /></a></main>;
+  if (!product) return <main className="mens-detail-page mens-state"><span className="eyebrow">Loading the release…</span></main>;
+  const images = product.images.length ? product.images : [{ id: 'primary', url: product.imageUrl, alt: product.name }];
+  const image = images[Math.min(imageIndex, images.length - 1)];
+  const totalStock = product.inventory.reduce((sum, item) => sum + Math.max(0, item.quantity), 0);
+  const availableSizes = product.inventory.filter((item) => item.quantity > 0);
+  return (
+    <main className="mens-detail-page">
+      <div className="mens-detail-breadcrumb"><a href="/mens">Men&apos;s shoes</a><span>/</span><span>{product.name}</span></div>
+      <section className="mens-detail-layout">
+        <div className="mens-detail-gallery">
+          <div className="mens-detail-image"><img src={image.url} alt={image.alt} decoding="async" /></div>
+          {images.length > 1 && <div className="mens-detail-thumbnails">{images.map((entry, index) => <button key={entry.id} className={index === imageIndex ? 'mens-detail-thumb mens-detail-thumb--active' : 'mens-detail-thumb'} onClick={() => setImageIndex(index)} aria-label={`Show product image ${index + 1}`} aria-pressed={index === imageIndex}><img src={entry.url} alt="" /></button>)}</div>}
+        </div>
+        <div className="mens-detail-info">
+          <span className="eyebrow">Hollywood Shoe / Men&apos;s collection</span>
+          <div className="mens-detail-title"><h1>{product.name}</h1><div className="mens-detail-price"><strong>{formatInr(productPrice(product))}</strong>{product.salePrice !== null && product.originalPrice !== null && <del>{formatInr(product.originalPrice)}</del>}</div></div>
+          <div className="mens-detail-badges">{product.badges.map((badge) => <span key={badge}>{badge}</span>)}</div>
+          <p className="mens-detail-lede">{product.shortDescription || product.description}</p>
+          <div className="mens-detail-rule" />
+          <div className="mens-detail-size-heading"><strong>Select a size</strong><span>{totalStock ? `${totalStock} units across ${availableSizes.length} sizes` : product.inventory.length ? 'Currently unavailable' : 'Size data not provided'}</span></div>
+          {product.inventory.length ? <div className="mens-size-grid">{product.inventory.map((item) => <button key={item.size} disabled={item.quantity <= 0} className={selectedSize === item.size ? 'mens-size mens-size--selected' : 'mens-size'} onClick={() => setSelectedSize(item.size)} aria-label={`Size ${item.size}${item.quantity <= 0 ? ', unavailable' : ''}`} aria-pressed={selectedSize === item.size}>{item.size}</button>)}</div> : <p className="mens-detail-muted">This release does not have size inventory recorded yet.</p>}
+          <details className="mens-size-guide"><summary>Size guide <ChevronDown size={15} /></summary><p>Sizes are shown exactly as stored for this release. Hollywood Shoe does not have a verified conversion chart for this product yet, so no conversion is implied.</p></details>
+          <div className="mens-detail-rule" />
+          <div className="mens-detail-section"><span className="eyebrow">Description</span><p>{product.description || product.shortDescription || 'No additional description has been provided for this release.'}</p></div>
+          <div className="mens-detail-facts"><div><span>Product type</span><strong>{product.productType || 'Footwear'}</strong></div><div><span>SKU</span><strong>{product.sku || 'Not provided'}</strong></div><div><span>Availability</span><strong>{totalStock ? 'In stock' : product.inventory.length ? 'Unavailable' : 'Not provided'}</strong></div></div>
+          <div className="mens-detail-note"><Info size={16} /><span>{selectedSize ? `Size ${selectedSize} selected.` : 'Select an available size to mark your preferred fit.'} Online cart and checkout are not connected in this release.</span></div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function CollectionPage({ route }: { route: FutureCollectionRoute }) {
   const label = route.slice(1).toUpperCase();
   const category = label === 'MENS' ? 'MENS' : label === 'WOMENS' ? 'WOMENS' : 'KIDS';
   const [products, setProducts] = useState<PublicProduct[]>([]);
@@ -462,11 +645,12 @@ function App() {
   }, [route]);
 
   if (route === '/post') return <AdminPostPage />;
+  if (route.startsWith('/mens/')) return <><Header route={route} /><MensProductDetailPage productId={decodeURIComponent(route.slice('/mens/'.length))} /></>;
 
   return (
     <>
       <Header route={route} />
-      {route === '/' ? <HomePage /> : <CollectionPage route={route} />}
+      {route === '/' ? <HomePage /> : route === '/mens' ? <MensCollectionPage /> : <CollectionPage route={route === '/womens' ? '/womens' : '/kids'} />}
     </>
   );
 }

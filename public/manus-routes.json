@@ -1,1 +1,1 @@
-{"routes":[{"path":"/","title":"Home"},{"path":"/mens","title":"Mens — Future"},{"path":"/womens","title":"Womens — Future"},{"path":"/kids","title":"Kids — Future"},{"path":"/post","title":"POST — Private Admin"}]}
+{"routes":[{"path":"/","title":"Home"},{"path":"/mens","title":"Men’s Shoes"},{"path":"/mens/:id","title":"Men’s Product Detail"},{"path":"/womens","title":"Womens — Future"},{"path":"/kids","title":"Kids — Future"},{"path":"/post","title":"POST — Private Admin"}]}

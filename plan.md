@@ -46,3 +46,49 @@ The approved public Home page and its public future placeholders are **locked**.
 
 ## Material constraints
 The browser never receives database credentials, AI service keys or storage credentials. The actual Manus image service is only invoked by server endpoints after role authorization. Until secure admin configuration is provided, the login screen explains that the private studio requires an approved administrator; it never fabricates a user or bypasses authorization in Preview.
+
+
+# Men’s Collection + Product Detail Redesign Plan
+
+## Preservation boundary
+The public Home route (`/`) is locked. Do not change `HomePage`, its media, copy, trending interactions, animations, footer, responsive behavior, or Home-visible header styling. The existing `/womens`, `/kids`, and `/post` functionality remains compatible. New work is limited to the Men’s collection route, Men’s product-detail routes, the public product API needed by those routes, and styles scoped to non-Home collection/detail views.
+
+## Audit findings
+- The current Men’s page is a generic three-card listing with an oversized “MENS in motion” introduction and no product links.
+- Public product data currently contains three published MENS sneakers: PUMA H-Street OG — Green, puma blue, and PUMA.
+- Real prices are available in INR; inventory is present for H-Street OG and PUMA, while puma blue has no stored inventory.
+- All current Men’s products use `Sneakers`; no reliable color-variant dataset exists, so the redesign will not invent color swatches.
+- Approved/public assets exist as one image per product; the detail gallery will gracefully use one image and expand automatically when additional approved assets exist.
+- No product-detail route or public detail API currently exists.
+
+## Design direction
+- **Movement:** quiet luxury editorial commerce—an art-directed collection index with disciplined product utility.
+- **Principles:** product-first hierarchy; restrained typography; evidence-based merchandising; fast, tactile interactions.
+- **Palette:** preserve Hollywood Shoe warm paper/ivory, charcoal, muted gray and oxblood, with neutral product wells so the real shoes remain the focus.
+- **Layout:** compact collection introduction, horizontal data-backed category lenses, utility toolbar, four/three-column desktop grid, and a two-column detail worktable.
+- **Signature elements:** prominent HOLLYWOOD wordmark treatment on non-Home collection views, thin editorial rules, warm neutral image wells, and small oxblood active indicators.
+- **Typography:** existing DM Serif Display for collection/product titles and Manrope for navigation, prices, controls and descriptions.
+- **Interactions:** category lenses, price filtering, sorting, clear filters, product links, gallery thumbnails, and size selection are stateful—not decorative. Respect reduced motion and keyboard focus.
+
+## Implementation approach
+1. Keep the current Home component and Home-specific styles unchanged.
+2. Extend route parsing with `/mens/:id` while preserving `/`, `/womens`, `/kids`, and `/post` behavior.
+3. Add a public `GET /api/products/:id` endpoint that returns only published Men’s product data, approved image URLs, prices, inventory and accurate descriptive fields.
+4. Expand the Men’s collection API response with the real fields needed by filters and cards; client-side filtering/sorting will avoid unnecessary round trips and preserve URL query state.
+5. Replace only the MENS branch with a dedicated `MensCollectionPage`: compact intro, six data-derived lenses (All Sneakers, Trending, New, Sale, In Stock, Published Edit), toolbar, price filter, sort control, count, responsive product grid, and honest empty states. Because the inventory currently contains only Sneakers and no color variants, the UI will say so through accurate states rather than inventing Formal/Loafer/Sandal products or colors.
+6. Add `MensProductDetailPage` with breadcrumb, large image/gallery, real name/prices/badges, inventory-backed size selection, a truthful size-guide note, description/details sections only when data exists, and a disabled/unavailable purchase area unless a cart service exists. Product IDs remain stable in URLs and browser refresh works.
+7. Scope new styling to `.mens-collection-page`, `.mens-detail-page`, and `.site-header--collection`; Home visual rules remain unchanged.
+8. Add `/mens/:id` to `public/manus-routes.json`, run type/build checks, verify real API/media responses, and test desktop/tablet/mobile plus keyboard and browser-back flows without writing or deleting shared product data.
+
+## Project structure changes
+| Path | Responsibility |
+|---|---|
+| `server.ts` | Public Men’s product detail endpoint and expanded collection response |
+| `src/main.tsx` | Men’s-only route parsing, collection/detail components; existing Home component preserved |
+| `src/styles.css` | Scoped Men’s collection/detail and non-Home header styles only |
+| `public/manus-routes.json` | Add the dynamic `/mens/:id` page declaration |
+| `plan.md` | This Men’s-only design and implementation decision record |
+| `TODO.md` | Men’s delivery outcomes and acceptance clauses |
+
+## Material constraints
+Only fields stored in the managed product records are shown. No fictional colors, sizes, materials, care instructions, delivery policies, stock, discounts or cart behavior will be presented. Product-card images and detail galleries use approved/public asset URLs; missing images render an accessible fallback rather than a broken image.

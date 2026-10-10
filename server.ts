@@ -115,23 +115,60 @@ app.get('/api/products', async (request, response, next) => {
       products: products
         .filter((product) => product.category === rawCategory)
         .map((product) => {
-          const image = product.assets.find((asset) => asset.id === product.primaryAssetId && asset.isApproved)
-            || product.assets.find((asset) => asset.isApproved);
+          const approvedAssets = product.assets.filter((asset) => asset.isApproved);
+          const image = approvedAssets.find((asset) => asset.id === product.primaryAssetId) || approvedAssets[0];
           return {
             id: product.id,
             name: product.name,
             description: product.shortDescription || product.description,
+            shortDescription: product.shortDescription,
             productType: product.productType,
+            sku: product.sku,
             category: product.category,
             originalPrice: product.originalPrice,
             salePrice: product.salePrice,
             badges: product.badges,
             featured: product.featured,
             trending: product.trending,
+            inventory: product.inventory,
             imageUrl: image?.url || null,
+            images: approvedAssets.map((asset) => ({ id: asset.id, url: asset.url, alt: product.name })),
           };
         })
         .filter((product) => product.imageUrl),
+    });
+  } catch (error) { next(error); }
+});
+
+app.get('/api/products/:id', async (request, response, next) => {
+  try {
+    const product = await getProduct(productId(request));
+    if (!product || product.status !== 'published' || product.category !== 'MENS') {
+      response.status(404).json({ error: { message: 'Men’s product not found.' } });
+      return;
+    }
+    const approvedAssets = product.assets.filter((asset) => asset.isApproved);
+    const primary = approvedAssets.find((asset) => asset.id === product.primaryAssetId) || approvedAssets[0];
+    if (!primary) {
+      response.status(404).json({ error: { message: 'This product has no approved public image.' } });
+      return;
+    }
+    response.json({
+      product: {
+        id: product.id,
+        name: product.name,
+        description: product.description,
+        shortDescription: product.shortDescription,
+        productType: product.productType,
+        sku: product.sku,
+        category: product.category,
+        originalPrice: product.originalPrice,
+        salePrice: product.salePrice,
+        badges: product.badges,
+        inventory: product.inventory,
+        imageUrl: primary.url,
+        images: approvedAssets.map((asset) => ({ id: asset.id, url: asset.url, alt: product.name })),
+      },
     });
   } catch (error) { next(error); }
 });
