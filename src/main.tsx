@@ -26,7 +26,7 @@ const media = {
   pumaSpeedcat: '/manus-storage/puma-speedcat-campaign_c8fb936a.jpg',
   pumaSpeedcatProduct: '/manus-storage/qgC7VqnT1nFO_d452084c.jpg',
   pumaSpeedcatBlack: '/manus-storage/Gj7VLG5izFC9_8ef2cba7.jpeg',
-  pumaMostro: '/manus-storage/wiylwmeC0RMj_406b15d9.jpg',
+  pumaMostro: '/manus-storage/n4hFawkiDM6d_68d4315f.jpg',
   pumaPalermoRose: '/manus-storage/J026xMeLSvJv_6b0cbcfe.jpg',
   pumaMostroCampaign: '/manus-storage/qTTcEUee3T6s_69420c33.jpg',
 };
